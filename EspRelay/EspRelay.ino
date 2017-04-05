@@ -20,8 +20,12 @@ void relayOff(){ digitalWrite(RelayPin, LOW); };
 
 void synchronizeData() {
     auto res = sendOMI(readUpdate(lastUpdate));
-    processSchedules(res);
-    processUsers(res);
+    String code = getReturnCode(res);
+
+    if (code == 200) {
+        processReservations(res);
+        processUsers(res);
+    }
 };
 
 

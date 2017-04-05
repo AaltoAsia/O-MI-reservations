@@ -33,6 +33,7 @@ void waitForHuman(uint8_t seconds);
 // Example: stream.printf(FS("Long formatting string for function that doesn't support String!"))
 char* _getMsgBuf(const __FlashStringHelper* fstr);
 #define FS(str) _getMsgBuf(F(str))
+#define FString(str) String(F(str))
 
 #ifndef MSGBUF_SIZE
 #define MSGBUF_SIZE 120
