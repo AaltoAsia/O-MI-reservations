@@ -1,23 +1,31 @@
 
 
 #include <Arduino.h>
+#include "MicroUtil.h"
+//#include "OMI.h"
+#include "OMIProcessing.h"
 
 // Configuration
 const char ssid = "aalto open";
 const char pass = "";
 #define RelayPin 13;
 
-void processSchedules(const char * message);
+
+// Declarations
+void processReservations(const char * message);
 void processUsers(const char * message);
-void sendReadSchedules() {
-    auto res = sendOMI(scheduleRead);
+
+void relayOn(){ digitalWrite(RelayPin, HIGH); };
+void relayOff(){ digitalWrite(RelayPin, LOW); };
+
+void synchronizeData() {
+    auto res = sendOMI(readUpdate(lastUpdate));
     processSchedules(res);
     processUsers(res);
 };
 
 
-void relayOn(){ digitalWrite(RelayPin, HIGH); };
-void relayOff(){ digitalWrite(RelayPin, LOW); };
+
 
 
 void setup() {
@@ -36,7 +44,7 @@ void setup() {
 void loop() {
     // every interval
     if ((millis() / 1000) % (15 * 60) == 0)
-        updateSchedules();
+        synchronizeData();
 }
 
 
