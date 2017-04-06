@@ -1,5 +1,7 @@
 
 #include <stdint.h>
+#include <pgmspace.h>
+#include <WString.h>
 
 // DEBUGGING Helpers
 #ifdef DEBUG_ESP_PORT
@@ -16,6 +18,7 @@
 #define DSLN(m) DEBUG_PORT.println(m)
 #define DNUM(n) DEBUG_PORT.print(String(n))
 #define DNUMLN(n) DEBUG_PORT.println(String(n))
+#define DFLUSH DEBUG_PORT.flush()
 #else
 #define D(m)
 #define DLN(m)
@@ -23,6 +26,7 @@
 #define DSLN(m)
 #define DNUM(n)
 #define DNUMLN(n)
+#define DFLUSH
 #endif
 
 
@@ -43,8 +47,10 @@ char* _getMsgBuf(const __FlashStringHelper* fstr);
 #define MSGBUFL_SIZE 400
 #endif
 
-extern _msgBuf;
-extern _msgBufL;
+extern char _msgBuf[MSGBUF_SIZE];
+extern char _msgBufL[MSGBUFL_SIZE];
+//extern char* _msgBuf;
+//extern char* _msgBufL;
 
 char* loadFashString(const __FlashStringHelper* fstr, char * buffer, size_t len);
 

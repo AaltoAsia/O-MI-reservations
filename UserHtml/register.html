@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Register user</title>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/css/bootstrap-datetimepicker.min.css" integrity="sha384-/XmhRcB6e51B3NO1S5VVWnNKCDM74NlX0cmxZUwCJPg2P/0ECTkBKnjnzNnF7rX5" crossorigin="anonymous">
+  </head>
+
+  <body>
+  <div id="registerModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <form id="registerForm">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Register user</h4>
+          </div>
+          <div class="modal-body">
+
+            <div class="form-group">
+              <label for="exampleInputEmail1">Username</label>
+              <input type="text" class="form-control" id="username" placeholder="Username">
+            </div>
+            <div class="form-group">
+              <label for="exampleInputPassword1">Password</label>
+              <input type="password" class="form-control" id="password" placeholder="Password">
+            </div>
+
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Register</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </form>
+
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+
+  <div id="reserveModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <form id="reserveForm">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Reserve time</h4>
+          </div>
+          <div class="modal-body">
+            <div style="overflow:hidden;">
+              <div class="form-group">
+                <div class="row">
+                  <div class="col-md-8">
+                    <div id="datetimepicker12"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Reserve</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </form>
+
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="./md5.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment-with-locales.min.js"
+    integrity="sha384-daLV89c+1LXRyCC/46DyRzIqY56dEwoZG16MUJdea4gumFn2960xhVkwD5t8ATij"
+    crossorigin="anonymous"></script>
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/js/bootstrap-datetimepicker.min.js"
+    integrity="sha384-V936AaxnYTkq53cO2z8e42PFtCCdZhbRttfhgX8U1K9weNYVdCMbDetUKTtllFdc"
+    crossorigin="anonymous"></script>
+  <script>
+$( function() {
+
+
+function switchToReserve() {
+  $("#registerModal").modal('hide');
+  $("#reserveModal")
+    .modal({backdrop: "static"})
+    .modal('show');
+  $('#datetimepicker12').datetimepicker({
+    inline: true,
+    sideBySide: true,
+    minDate: new Date()
+  });
+}
+$("#registerModal")
+  .modal({backdrop: "static"})
+  .modal('show');
+
+$( "#registerForm" ).submit(function( event ) {
+  event.preventDefault();
+
+  var userid = $("#username").val();
+  var pass = md5($("#password").val() + userid);
+  var value = userid + ":" + pass;
+
+  var omiEnvelope = '\
+<omi:omiEnvelope xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xmlns:omi="omi.xsd" version="1.0" ttl="20">\
+  <omi:write msgformat="odf">\
+    <omi:msg>\
+      <Objects xmlns="odf.xsd">\
+        <Object>\
+          <id>ChargingPole</id>\
+          <Object>\
+            <id>Users</id>\
+            <InfoItem name="Register">\
+              <value>' + value + '</value>\
+            </InfoItem>\
+          </Object>\
+        </Object>\
+      </Objects>\
+    </omi:msg>\
+  </omi:write>\
+</omi:omiEnvelope>';
+
+  switchToReserve();
+  //$.post("/omi/node/", omiEnvelope, switchToReserve);
+
+}); //submit
+
+$( "#reserveForm" ).submit(function( event ) {
+  event.preventDefault();
+
+  var userid = $("#username").val();
+  //var pass = md5($("#datetimepicker12").val() + userid);
+  //var value = userid + ":" + pass;
+
+  var dateMoment = $('#datetimepicker12').data("DateTimePicker").date();
+  var unixTime = dateMoment.unix();
+  var value = userid + ":" + unixTime;
+
+  var omiEnvelope = '\
+<omi:omiEnvelope xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xmlns:omi="omi.xsd" version="1.0" ttl="20">\
+  <omi:write msgformat="odf">\
+    <omi:msg>\
+      <Objects xmlns="odf.xsd">\
+        <Object>\
+          <id>ChargingPole</id>\
+          <Object>\
+            <id>Reservations</id>\
+            <InfoItem name="AddReservation">\
+              <value>' + value + '</value>\
+            </InfoItem>\
+          </Object>\
+        </Object>\
+      </Objects>\
+    </omi:msg>\
+  </omi:write>\
+</omi:omiEnvelope>';
+
+  //$.post("/omi/node/", omiEnvelope, function() {alert("Success!");});
+
+}); //submit
+
+}); // jquery
+  </script>
+
+  </body>
+</html>
