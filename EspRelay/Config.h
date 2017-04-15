@@ -17,4 +17,19 @@
 #define OMI_URL "https://otaniemi3d.cs.hut.fi/omi/node/"
 #define OMI_CERT_FINGERPRINT String("6D 7F AE 98 E6 4A 74 76 45 26 7F 66 14 3C 9F 58 43 CB 09 B5")
 
+// Timing source
+
+#define TIMEZONE 0
+
+#include <time.h>
+#ifdef __cplusplus
+extern "C"{
+#endif
+#include <sntp.h>
+struct tm * ICACHE_FLASH_ATTR sntp_localtime(const time_t * tim_p);
+#ifdef __cplusplus
+} // extern "C"
+#endif
+
+
 #endif

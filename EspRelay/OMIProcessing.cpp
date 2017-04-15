@@ -50,16 +50,27 @@ int getReturnCode(String& response) {
     String needle(F("<omi:return returnCode=\""));
     String needle2(F("<return returnCode=\""));
 
-    int start = -1, end = -1;
+    int start = -1, end = -1, tmpStart = -1;
     
-    if ((start = response.indexOf(needle)) > 0)
+
+    if ((start = response.indexOf(needle)) > 0) {
         start += needle.length();
-    if ((start = response.indexOf(needle2)) > 0)
-        start += needle2.length();
-    if (start > 0 &&
-            (end = response.indexOf('"', start) > 0)) {
-        return response.substring(start, end).toInt();
     }
+    if ((tmpStart = response.indexOf(needle2)) > 0) {
+        start = tmpStart;
+        start += needle2.length();
+    }
+    if (start > 0 &&
+            (end = response.indexOf('"', start)) > 0) {
+        D("[OMI-parser] response return parsed: ");
+        DNUM(start); D(" "); DNUMLN(end);
+        String result = response.substring(start,end);
+        DSLN(result);
+        DLN("===========");
+        return result.toInt();
+    }
+    DLN("[OMI-parser] Error: no return found");
+    return -1;
 
 }
 
@@ -73,17 +84,21 @@ bool findObject(const String& xml, const String& objectId, String& result, unsig
 
     int start = NOT_FOUND,
         end = NOT_FOUND, objStart = NOT_FOUND;
-    while ( processedChars != 0 && objStart != NOT_FOUND ) {
+    while ( true ) {
 
         // find Object
         if ((objStart = xml.indexOf(objectStart, processedChars)) >= 0)
             processedChars = objStart + objectStart.length();
-        else break;
+        else {
+            processedChars = xml.length();   
+            D("[OMI-parser] Search ended for "); DSLN(objectId);
+            break;
+        }
 
         
 
         // find the id of the Object
-        if ((start = xml.indexOf(idStart, objStart)) > 0) {
+        if ((start = xml.indexOf(idStart, processedChars)) > 0) {
 
             start += idStart.length(); // start = start of id
 
@@ -123,14 +138,14 @@ bool findObject(const String& xml, const String& objectId, String& result, unsig
             }
             else {
                 D("[OMI-parser] end tag for id not found for Object:");
-                DS(xml.substring(objStart, min(xml.length(), objStart + 160)));
+                DS(xml.substring(objStart, objStart + 160));
                 DLN("...");
                 return false;
             }
         }
         else {
             D("[OMI-parser] id not found for Object:");
-            DS(xml.substring(objStart, min(xml.length(), objStart + 160)));
+            DS(xml.substring(objStart, objStart + 160));
             DLN("...");
             return false;
         }
@@ -146,13 +161,17 @@ bool findInfoItem(const String& xml, const String& infoitemName, String& result,
 
     D("[OMI-parser] Starting search for InfoItem: "); DSLN(infoitemName);
 
-    while ( processedChars != 0 && itemStart != NOT_FOUND) {
+    while ( true ) {
 
         // Find the start of item
         if ((itemStart = xml.indexOf(itemStartStr, processedChars)) >= 0) {
             processedChars = itemStart + itemStartStr.length();
         }
-        else break;
+        else {
+            processedChars = xml.length();
+            DLN("[OMI-parser] infoitem search end");
+            break;
+        }
 
         // find end of starting tag
         if ((end = xml.indexOf(tagEnd, itemStart)) == NOT_FOUND) {
@@ -228,18 +247,28 @@ bool findValue(const String& xml, String& result, unsigned& fromIndex) {
 
         fromIndex = start;
 
-        // find end
-        if ((end = xml.indexOf(valueEndStr, start)) != NOT_FOUND) {
-            D("[OMI-parser] FOUND ");
+        // find open tag end
+        if ((start = xml.indexOf(tagEnd, fromIndex)) != NOT_FOUND) {
+            start += 1; // '>'
 
-            result = xml.substring(start, end);
-            DSLN(result);
+            fromIndex = start;
 
-            fromIndex = end + valueEndStr.length();
-            return true;
-        }
-        else {
-            DLN("[OMI-parser] Error: closing tag not found");
+            // find end
+            if ((end = xml.indexOf(valueEndStr, start)) != NOT_FOUND) {
+                D("[OMI-parser] FOUND ");
+
+                result = xml.substring(start, end);
+                DSLN(result);
+
+                fromIndex = end + valueEndStr.length();
+                return true;
+            }
+            else {
+                DLN("[OMI-parser] Error: closing tag not found");
+                return false;
+            }
+        } else {
+            DLN("[OMI-parser] Error: starting tag end not found");
             return false;
         }
     }

@@ -11,12 +11,21 @@ char * readUpdate(const char* lastUpdateTimestamp){
 
 #define GetValueOfItem(name, object, value) \
                 tmp = 0; tmpb = 0; \
-                if (!(findInfoItem((name), (object), item, tmp) \
+                if (!(findInfoItem((object), (name), item, tmp) \
                             && findValue(item, (value), tmpb))) { \
                     D("[OMIreserve] Error: Cannot parse "); DS(name); \
                     continue; \
                 }
 
+uint64_t char2LL(String str);
+uint64_t char2LL(String str)
+{
+  uint64_t result = 0; // Initialize result
+  // Iterate through all characters of input string and update result
+  for (int i = 0; i < str.length(); ++i)
+    result = result*10 + str[i] - '0';
+  return result;
+}
 
 void processReservations(String& omiResponse, DB& database) {
     unsigned tmp = 0, tmpb = 0;
@@ -24,12 +33,13 @@ void processReservations(String& omiResponse, DB& database) {
     String reservationsXml;
     if (findObject(omiResponse, ReservationsObjectId, reservationsXml, tmp)) {
         String reservationObject;
-        unsigned processed = 0;
+        unsigned processed = 25; // Reservation object length ~ 30
 
         // TODO: update only changes to db
         database.clearAllReservations();
 
         while (processed < reservationsXml.length()) {
+            D("PROCESSED = "); DNUM(processed);
             if (findObject(reservationsXml, String(), reservationObject, processed)){
                 String item;
                 String value;
@@ -39,15 +49,22 @@ void processReservations(String& omiResponse, DB& database) {
                 reservation.userID = value;
 
                 GetValueOfItem(StartsAfterName, reservationObject, value)
-                reservation.unixStartTime = value.toInt();
+                DSLN(value);
+                reservation.unixStartTime = char2LL(value);
+                DSLN(reservation.unixStartTime);
+
                 //reservation.internalStartTime = getCurrentTime() + parseInt(value);
 
                 GetValueOfItem(EndsAfterName, reservationObject, value)
                 //reservation.internalEndTime = getCurrentTime() + parseInt(value);
-                reservation.unixEndTime = value.toInt();
+                reservation.unixEndTime = char2LL(value);
 
                 // TODO: other items
 
+                DLN("[OMIreserve] PARSED RESERVATION SUCCESFULLY");
+                DNUM(reservation.unixStartTime);
+                D(" ");
+                DNUM(reservation.unixEndTime);
                 reservation.active = true;
                 database.addReservation(reservation);
             }
@@ -57,7 +74,7 @@ void processReservations(String& omiResponse, DB& database) {
 
 #define SaveUserAuthData(name, typee) \
                 tmp = 0; tmpb = 0; \
-                if (findInfoItem((name), userObject, item, tmp) \
+                if (findInfoItem(userObject, (name), item, tmp) \
                             && findValue(item, value, tmpb)) { \
                     userAuth.type = (typee); \
                     userAuth.authData = value; \
@@ -70,7 +87,7 @@ void processUsers(String& omiResponse, DB& database) {
     String usersXml;
     if (findObject(omiResponse, UsersObjectId, usersXml, tmp)) {
         String userObject;
-        unsigned processed = 0;
+        unsigned processed = 20;
 
         // TODO: update only changes to db
         database.clearAllUsers();
