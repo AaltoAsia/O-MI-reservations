@@ -1,0 +1,6 @@
+[submodule "EspRelay/makeEspArduino"]
+	path = EspRelay/makeEspArduino
+	url = https://github.com/plerup/makeEspArduino
+[submodule "EspRelay/espsoftwareserial"]
+	path = EspRelay/espsoftwareserial
+	url = https://github.com/plerup/espsoftwareserial
