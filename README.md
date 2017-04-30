@@ -23,8 +23,8 @@ Other software needed
 Arduino with [esp8266 core](https://github.com/esp8266/Arduino) for building and
 uploading programs to hardware.
 
-Some http server for serving the user interface in `UserHtml` directory or just
-open them in your pc locally.
+Some http server for serving the user interface in `UserHtml` directory on the
+same server as an O-MI node server.
 
 [O-MI node server]() with agent for handling the reservations. This link has it
 preinstalled.
@@ -87,5 +87,18 @@ requests to the server to store information. The esp program polls the server
 for information every n seconds and fetches internet time with SNTP protocol.
 Then it compares the internet time to the reservation start and end times to see
 if one is active. If it is, then it sends relay a command to turn it on or off.
+
+
+How to use
+----------
+
+1. Plug the device in a wall socket
+2. Go to the user interface with browser `register.html` ([or use the demo server](https://otaniemi3d.cs.hut.fi/PoleFront/register.html))
+3. Write some user name and pass and press `Register`.
+4. Select date and time when the socket should turn on.
+5. Write duration in seconds before turning off.
+6. Press `Reserve`
+7. Done. You should see the device make action at the specified time
+   (+-30 seconds)
 
 
