@@ -23,6 +23,9 @@ Other software needed
 Arduino with [esp8266 core](https://github.com/esp8266/Arduino) for building and
 uploading programs to hardware.
 
+Some http server for serving the user interface in `UserHtml` directory or just
+open them in your pc locally.
+
 [O-MI node server]() with agent for handling the reservations. This link has it
 preinstalled.
 
@@ -47,6 +50,7 @@ reprogrammed, which is quite easy.
 
 1. Open `Relay/BlinkX/BlinkX.ino` in Arduino IDE
 2. Change board to `Generic ESP8266 Module`
+2. Open Sonoff module package to reveal the circuit board
 3. Solder a pin header to Sonoff holes marked as VCC, TX, RX, GND
 4. Connect USB to TTL adapter to the header (TX to RX, RX to TX, VCC to VCC,
    GND to GND)
@@ -55,7 +59,7 @@ reprogrammed, which is quite easy.
 6. Select right port from Arduino IDE
 7. Press Upload
 
-This program only listens for "I" or "O" from serial and sets the relay to
+This program only waits for "I" or "O" from serial and sets the relay to
 corresponding state.
 
 
@@ -74,5 +78,14 @@ Assembling
 2. Connect VCC to VCC and GND to GND
 3. Done.
 
+
+How it works
+------------
+
+The server stores some reservations in a database. The user interface sends
+requests to the server to store information. The esp program polls the server
+for information every n seconds and fetches internet time with SNTP protocol.
+Then it compares the internet time to the reservation start and end times to see
+if one is active. If it is, then it sends relay a command to turn it on or off.
 
 
