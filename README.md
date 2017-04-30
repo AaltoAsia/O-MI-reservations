@@ -5,10 +5,12 @@
 ESP8266 project which has a reservation system. Uses [O-DF]()/[O-MI]() protocols for control.
 
 
+
+
 Components
 ----------
 
-* [Sonoff POW smart socket](https://www.itead.cc/smart-socket-eu.html) (€11.80)
+* [Sonoff smart socket](https://www.itead.cc/smart-socket-eu.html) (€11.80)
 * ESP8266 for better extension possibilities. I used
   [Wemos mini](https://www.aliexpress.com/store/product/D1-mini-Mini-NodeMcu-4M-bytes-Lua-WIFI-Internet-of-Things-development-board-based-ESP8266/1331105_32529101036.html?spm=2114.12010615.0.0.aHT9H7)
   (€3.74)
@@ -100,5 +102,12 @@ How to use
 6. Press `Reserve`
 7. Done. You should see the device make action at the specified time
    (+-30 seconds)
+
+
+Sources
+-------
+
+* This repository for software for the hardware.
+* Server Agent source file for O-MI Node server at [here](https://github.com/TK009/O-MI/blob/e0a594b443fa4e8225dd8532aa3a301d6bfb217f/Agents/src/main/scala/agents/ChargingPoleAgent.scala)
 
 
