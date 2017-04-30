@@ -4,6 +4,7 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMulti.h>
 #include <ESP8266HTTPClient.h>
+#include <SoftwareSerial.h>
 #include "MicroUtil.h"
 //#include "OMI.h"
 #include "Config.h"
@@ -15,12 +16,15 @@
 HTTPCLIENT http;
 DB database;
 ESP8266WiFiMulti WiFiMulti;
-
+#ifndef RELAY_SERIAL
+SoftwareSerial swSer(14, 12); // RX, TX
+#define RELAY_SERIAL swSer
+#endif
 
 //void relayOn(){ digitalWrite(RelayPin, HIGH); };
 //void relayOff(){ digitalWrite(RelayPin, LOW); };
-void relayOn(){ Serial1.print("I"); Serial1.flush(); DLN("[RELAY] ON"); };
-void relayOff(){ Serial1.print("O"); Serial1.flush(); DLN("[RELAY] OFF"); };
+void relayOn(){ RELAY_SERIAL.print("I"); RELAY_SERIAL.flush(); DLN("[RELAY] ON"); };
+void relayOff(){ RELAY_SERIAL.print("O"); RELAY_SERIAL.flush(); DLN("[RELAY] OFF"); };
 
 time_t getCurrentTime() { return time((time_t*)0); };
 
@@ -82,7 +86,7 @@ void checkStatus() {
 void setup() {
     // serialSetup();
     Serial.begin(115200);
-    Serial1.begin(115200);
+    RELAY_SERIAL.begin(115200);
 
 #   ifdef DEBUG_ESP_PORT
         DEBUG_ESP_PORT.setDebugOutput(true);

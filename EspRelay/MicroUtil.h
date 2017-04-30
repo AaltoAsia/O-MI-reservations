@@ -3,12 +3,16 @@
 #include <pgmspace.h>
 #include <WString.h>
 
+
+// Enables the use of ';' after it but does nothing
+#define NOP do {} while (false)
+
 // DEBUGGING Helpers
 #ifdef DEBUG_ESP_PORT
 #define DEBUG_PORT DEBUG_ESP_PORT
 #define DFORMAT(...) DEBUG_ESP_PORT.printf( __VA_ARGS__ )
 #else
-#define DFORMAT(...)
+#define DFORMAT(...) NOP
 #endif
 
 #ifdef DEBUG_PORT
@@ -20,13 +24,13 @@
 #define DNUMLN(n) DEBUG_PORT.println(String(n))
 #define DFLUSH DEBUG_PORT.flush()
 #else
-#define D(m)
-#define DLN(m)
-#define DS(m)
-#define DSLN(m)
-#define DNUM(n)
-#define DNUMLN(n)
-#define DFLUSH
+#define D(m) NOP
+#define DLN(m) NOP
+#define DS(m) NOP
+#define DSLN(m) NOP
+#define DNUM(n) NOP
+#define DNUMLN(n) NOP
+#define DFLUSH NOP
 #endif
 
 
