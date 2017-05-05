@@ -1,4 +1,5 @@
-<!-- vim: tw=80 -->
+<!-- vim: tw=80
+-->
 
 # Embedded reservation system
 
@@ -28,8 +29,8 @@ uploading programs to hardware.
 Some http server for serving the user interface in `UserHtml` directory on the
 same server as an O-MI node server.
 
-[O-MI node server]() with agent for handling the reservations. This link has it
-preinstalled.
+[O-MI node server](https://github.com/TK009/O-MI/releases/tag/ChargingPole-mechatronics)
+with agent for handling the reservations. This link has it preinstalled.
 
 * Run by starting `bin/o-mi-node.sh`
 * The device needs a network connection to this server
@@ -76,8 +77,10 @@ Programming ESP8266 Module
 Assembling
 ---------
 
-1. Connect Sonoff serial to esp8266 module serial (TX to RX, RX to TX)
-2. Connect VCC to VCC and GND to GND
+![Connections](./doc/connections.jpg)
+
+1. Connect esp8266 module serial to Sonoff serial (TX to RX is enough)
+2. Connect 3V3 to VCC and GND to GND
 3. Done.
 
 
@@ -108,6 +111,8 @@ Sources
 -------
 
 * This repository for software for the hardware.
-* Server Agent source file for O-MI Node server at [here](https://github.com/TK009/O-MI/blob/e0a594b443fa4e8225dd8532aa3a301d6bfb217f/Agents/src/main/scala/agents/ChargingPoleAgent.scala)
+* [Server Agent source file for O-MI Node server at here](https://github.com/TK009/O-MI/blob/e0a594b443fa4e8225dd8532aa3a301d6bfb217f/Agents/src/main/scala/agents/ChargingPoleAgent.scala)
+  * or as [a complete package here](https://github.com/TK009/O-MI/releases/tag/ChargingPole-mechatronics)
+
 
 
