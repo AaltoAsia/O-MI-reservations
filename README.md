@@ -14,10 +14,10 @@ Components
 * [Sonoff smart socket](https://www.itead.cc/smart-socket-eu.html) (€11.80)
 * ESP8266 for better extension possibilities. I used
   [Wemos mini](https://www.aliexpress.com/store/product/D1-mini-Mini-NodeMcu-4M-bytes-Lua-WIFI-Internet-of-Things-development-board-based-ESP8266/1331105_32529101036.html?spm=2114.12010615.0.0.aHT9H7)
-  (€3.74)
+  (~5€)
 * USB to TTL adapter (3.3V recommended) for programming Sonoff (~3€)
 
-Sum ~18.54 €
+Sum ~20 €
 
 
 Other software needed
