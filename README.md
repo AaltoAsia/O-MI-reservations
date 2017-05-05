@@ -111,6 +111,17 @@ How to use
 7. Done. You should see the device make action at the specified time
    (+-30 seconds)
 
+Future improvements
+-------------------
+
+* Authentication had only registration part, so in future it would be nice to have
+  * Permissions control
+  * NFC register and login
+* Lock for installation in a charging pole
+  * Lock can be operated only by the user of the currently active reservation.
+* GSM module support
+
+This project could also be used to lock doors or used in some other project, but would require some refactoring for easier refitting to new systems.
 
 Sources
 -------
