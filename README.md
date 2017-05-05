@@ -29,7 +29,10 @@ uploading programs to hardware.
 Some http server for serving the user interface in `UserHtml` directory on the
 same server as an O-MI node server. I used
 [nginx](https://nginx.org/en/download.html) with [this kind of
-configuration](./doc/nginx_reservations.conf)
+configuration](./doc/nginx_reservations.conf).
+
+* Copy the configuration file to /etc/nginx/
+* put `include /etc/nginx_reservations.conf;` in /etc/nginx.conf
 
 [O-MI node server](https://github.com/TK009/O-MI/releases/tag/ChargingPole-mechatronics)
 with agent for handling the reservations. This link has it preinstalled.
