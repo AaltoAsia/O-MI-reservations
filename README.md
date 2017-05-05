@@ -3,7 +3,7 @@
 
 # Embedded reservation system
 
-ESP8266 project which has a reservation system. Uses [O-DF]()/[O-MI]() protocols for control.
+ESP8266 project which has a reservation system. Uses [O-DF](http://www.opengroup.org/iot/odf/index.htm)/[O-MI](http://www.opengroup.org/iot/omi/index.htm) protocols for control.
 
 
 
