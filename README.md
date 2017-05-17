@@ -1,9 +1,11 @@
 <!-- vim: tw=80
 -->
 
-# Embedded reservation system
+# Embedded Charging system
 
-ESP8266 project which has a reservation system. Uses [O-DF](http://www.opengroup.org/iot/odf/index.htm)/[O-MI](http://www.opengroup.org/iot/omi/index.htm) protocols for control.
+ESP8266 project which is meant to be used in a EV charging use case. Uses
+[O-DF](http://www.opengroup.org/iot/odf/index.htm)/[O-MI](http://www.opengroup.org/iot/omi/index.htm)
+protocols for control.
 
 
 
@@ -11,13 +13,6 @@ ESP8266 project which has a reservation system. Uses [O-DF](http://www.opengroup
 Components
 ----------
 
-* [Sonoff smart socket](https://www.itead.cc/smart-socket-eu.html) (€11.80)
-* ESP8266 for better extension possibilities. I used
-  [Wemos mini](https://www.aliexpress.com/store/product/D1-mini-Mini-NodeMcu-4M-bytes-Lua-WIFI-Internet-of-Things-development-board-based-ESP8266/1331105_32529101036.html?spm=2114.12010615.0.0.aHT9H7)
-  (~5€)
-* USB to TTL adapter (3.3V recommended) for programming Sonoff (~3€)
-
-Sum ~20 €
 
 
 Other software needed
@@ -82,35 +77,27 @@ Programming ESP8266 Module
 Assembling
 ---------
 
+<!-- FIXME: 
 ![Connections](./doc/connections.jpg)
 
 1. Connect esp8266 module serial to Sonoff serial (TX to RX is enough)
 2. Connect 3V3 to VCC and GND to GND
 3. Done.
+-->
 
 
 How it works
 ------------
 
 The server stores some reservations in a database. The user interface sends
-requests to the server to store information. The esp program polls the server
-for information every n seconds and fetches internet time with SNTP protocol.
-Then it compares the internet time to the reservation start and end times to see
-if one is active. If it is, then it sends relay a command to turn it on or off.
+requests to the server to store information. The esp program listens the server
+for information.
 
 
 How to use
 ----------
 
-1. Plug the device in a wall socket
-2. Go to the user interface with browser `register.html` ([or use the demo server](https://otaniemi3d.cs.hut.fi/PoleFront/register.html))
-3. Write some user name and pass and press `Register`.
-4. Select date and time when the socket should turn on.
-5. Write duration in seconds before turning off.
-6. Press `Reserve`
-7. Done. You should see the device make action at the specified time
-   (+-30 seconds)
-
+TODO
 
 Sources
 -------
