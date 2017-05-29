@@ -1,49 +1,52 @@
 
 #include <Arduino.h>
-#include <ESP8266HTTPClient.h>
 #include <pgmspace.h>
 #include "OMIProcessing.h"
 #include "Config.h"
 #include "MicroUtil.h"
 
-
 String sendOMI(HTTPCLIENT & http, const char* request) {
     yield();
+#   if (HTTPCLIENT != WebSocketsClient)
+        DLN("[HTTP] begin...");
+        http.begin(OMI_URL, OMI_CERT_FINGERPRINT);
+        http.addHeader(FS("Content-Type"), "text/xml");
 
-    DLN("[HTTP] begin...");
-    http.begin(OMI_URL, OMI_CERT_FINGERPRINT);
+        DLN("[HTTP] POST... with payload: ");
+        DSLN(request);
 
-    http.addHeader(FS("Content-Type"), "text/xml");
-    DLN("[HTTP] POST... with payload: ");
-    DSLN(request);
-    
-    int httpCode = 
-        http.POST((uint8_t*)request, strlen(request));
-
-
-    // httpCode will be negative on error
-    if(httpCode > 0) {
-        // HTTP header has been send and Server response header has been handled
-        D("[HTTP] POST done, code: "); DNUMLN(httpCode);
+        inthttpCode = 
+            http.POST((uint8_t*)request, strlen(request));
+        // httpCode will be negative on error
+        if(httpCode > 0) {
+            // HTTP header has been send and Server response header has been handled
+            D("[HTTP] POST done, code: "); DNUMLN(httpCode);
 
 
-        // print result into serial
-        String payload = http.getString();
-        http.end();
-        DSLN(payload);
-        DLN("=================== EOF ====================");
+            // print result into serial
+            String payload = http.getString();
+            http.end();
+            DSLN(payload);
+            DLN("=================== EOF ====================");
 
-        // Success
-        //if(httpCode == HTTP_CODE_OK)
+            // Success
+            //if(httpCode == HTTP_CODE_OK)
 
-        return payload;
+            return payload;
 
-    } else {
-        http.end();
-        D("[HTTP] POST... failed, error: ");
-        DSLN(http.errorToString(httpCode).c_str());
+        } else {
+            http.end();
+            D("[HTTP] POST... failed, error: ");
+            DSLN(http.errorToString(httpCode).c_str());
+            return String("");
+        }
+#   else
+        http.sendTXT(request);
         return String("");
-    }
+#   endif
+    
+
+
 }
 
 int getReturnCode(String& response) {
