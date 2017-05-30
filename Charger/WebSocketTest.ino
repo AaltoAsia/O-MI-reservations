@@ -1,7 +1,6 @@
 // vim: et ts=2 sw=2
 
 #include "Config.h"
-#include "TinyGSM/TinyGsmClient.h"
 #include "MicroUtil.h"
 #include "types.h"
 #include <ESP8266WiFi.h>
