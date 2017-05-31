@@ -1,6 +1,0 @@
-[submodule "EspRelay/makeEspArduino"]
-	path = Charger/makeEspArduino
-	url = https://github.com/plerup/makeEspArduino
-[submodule "EspRelay/espsoftwareserial"]
-	path = Charger/espsoftwareserial
-	url = https://github.com/plerup/espsoftwareserial
