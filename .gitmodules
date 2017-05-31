@@ -1,6 +1,6 @@
 [submodule "EspRelay/makeEspArduino"]
-	path = WebSocketTest/makeEspArduino
+	path = Charger/makeEspArduino
 	url = https://github.com/plerup/makeEspArduino
 [submodule "EspRelay/espsoftwareserial"]
-	path = WebSocketTest/espsoftwareserial
+	path = Charger/espsoftwareserial
 	url = https://github.com/plerup/espsoftwareserial
