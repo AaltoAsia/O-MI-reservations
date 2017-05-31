@@ -9,7 +9,7 @@
 
 
 TinyGsm modem(SerialAT);
-//TinyGsmClient client(modem);
+TinyGsmClient client(modem);
 DB database;
 
 WebSocketsClient webSocket;
@@ -125,7 +125,7 @@ bool modemConnect() {
   //DLN(" CONNECT OK ");
 
   webSocket.onEvent(webSocketEvent);
-  webSocket.begin(&modem, OMI_HOST, 80, OMI_PATH, "omi");
+  webSocket.begin(&client, OMI_HOST, 80, OMI_PATH, "omi");
 }
 
 

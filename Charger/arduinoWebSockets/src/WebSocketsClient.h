@@ -42,7 +42,7 @@ class WebSocketsClient: private WebSockets {
         void begin(const char *host, uint16_t port, const char * url = "/", const char * protocol = "arduino");
         void begin(String host, uint16_t port, String url = "/", String protocol = "arduino");
 #if (WEBSOCKETS_NETWORK_TYPE == NETWORK_A7_GSM)
-        void begin(TinyGsm* modem, const char *host, uint16_t port, const char * url, const char * protocol);
+        void begin(TinyGsmClient* client, const char *host, uint16_t port, const char * url, const char * protocol);
 #endif
 
 #if (WEBSOCKETS_NETWORK_TYPE == NETWORK_ESP8266)

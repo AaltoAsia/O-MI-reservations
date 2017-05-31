@@ -76,9 +76,9 @@ void WebSocketsClient::begin(const char *host, uint16_t port, const char * url, 
 #endif
 }
 #if (WEBSOCKETS_NETWORK_TYPE == NETWORK_A7_GSM)
-void WebSocketsClient::begin(TinyGsm* modem, const char *host, uint16_t port, const char * url, const char * protocol) {
+void WebSocketsClient::begin(TinyGsmClient* client, const char *host, uint16_t port, const char * url, const char * protocol) {
     begin(host,port,url,protocol);
-    _client.tcp = modem;
+    _client.tcp = client;
 }
 #endif
 
@@ -620,7 +620,8 @@ void WebSocketsClient::handleHeader(WSclient_t * client, String * headerLine) {
             sendHeader(client);
         } else {
             DEBUG_WEBSOCKETS("[WS-Client][handleHeader] no Websocket connection close.\n");
-            client->tcp->write("This is a webSocket client!");
+            const char* msg = "This is a webSocket client!";
+            client->tcp->write((const uint8_t*)msg, sizeof(msg));
             clientDisconnect(client);
         }
     }
