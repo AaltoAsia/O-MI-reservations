@@ -58,8 +58,8 @@ const char pass[] = "";
 
 // activate custom GSM support; not supported in the original at the time of writing, 2017-05
 #define WEBSOCKETS_NETWORK_TYPE NETWORK_A7_GSM
-#include "TinyGSM/TinyGsmClient.h"
-#include "arduinoWebSockets/src/WebSocketsClient.h"
+#include "libraries/TinyGSM/TinyGsmClient.h"
+#include "libraries/arduinoWebSockets/src/WebSocketsClient.h"
 #define HTTPCLIENT WebSocketsClient
 
 

@@ -141,8 +141,8 @@
 #elif (WEBSOCKETS_NETWORK_TYPE == NETWORK_A7_GSM)
 
 #   define TINY_GSM_MODEM_A7
-#   include "TinyGSM/TinyGsmClient.h"
-#   include "TinyGSM/TinyGsmClientA6.h"
+#   include "../TinyGSM/TinyGsmClient.h"
+#   include "../TinyGSM/TinyGsmClientA6.h"
 #   define WEBSOCKETS_NETWORK_CLASS TinyGsmClient
 #   define WEBSOCKETS_NETWORK_SERVER_CLASS TinyGsmServer
 
