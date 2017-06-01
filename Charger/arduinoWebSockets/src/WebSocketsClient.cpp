@@ -112,6 +112,7 @@ void WebSocketsClient::beginSocketIO(String host, uint16_t port, String url, Str
  * called in arduino loop
  */
 void WebSocketsClient::loop(void) {
+    yield();
     if(!clientIsConnected(&_client)) {
 
 #if (WEBSOCKETS_NETWORK_TYPE == NETWORK_ESP8266)

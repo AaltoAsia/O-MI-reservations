@@ -125,7 +125,9 @@ bool modemConnect() {
   //DLN(" CONNECT OK ");
 
   webSocket.onEvent(webSocketEvent);
+  yield();
   webSocket.begin(&client, OMI_HOST, 80, OMI_PATH, "omi");
+  yield();
 }
 
 
@@ -135,9 +137,9 @@ bool modemConnect() {
 void loop() {
     
   // if not connected try to connect
-  //if (!modem.connected()) {
-  //  if (!modemConnect()) return;
-  //}
+  if (!client.connected()) {
+    if (!modemConnect()) return;
+  }
 
 
   const char* testRead = 

@@ -48,3 +48,5 @@ addr2line: $(MAIN_EXE)
 
 upmon: upload
 	screen $(UPLOAD_PORT) $(MONITOR_SPEED)
+mon:
+	screen $(UPLOAD_PORT) $(MONITOR_SPEED)
