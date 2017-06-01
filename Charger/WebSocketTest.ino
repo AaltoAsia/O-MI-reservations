@@ -128,6 +128,7 @@ bool modemConnect() { // TODO: clean, move to websocket library?
   yield();
   webSocket.begin(&client, OMI_HOST, 80, OMI_PATH, "omi");
   yield();
+  webSocket.connectedCb();
 }
 
 

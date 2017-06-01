@@ -136,7 +136,6 @@ void WebSocketsClient::loop(void) {
             _client.tcp = new WiFiClient();
         }
 #elif (WEBSOCKETS_NETWORK_TYPE == NETWORK_A7_GSM)
-        // nop
         if (_client.tcp->connected()) {
             connectedCb();
         } else {
