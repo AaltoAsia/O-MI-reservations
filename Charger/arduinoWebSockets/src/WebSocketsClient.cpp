@@ -404,7 +404,7 @@ void WebSocketsClient::handleClientData(void) {
         switch(_client.status) {
             case WSC_HEADER:
             {
-                String headerLine = _client.tcp->readStringUntil('\n\r');
+                String headerLine = _client.tcp->readStringUntil('\n');
                 handleHeader(&_client, &headerLine);
             }
                 break;
@@ -430,7 +430,7 @@ void WebSocketsClient::handleClientData(void) {
  */
 void WebSocketsClient::sendHeader(WSclient_t * client) {
 
-	static const char * NEW_LINE = "\r\n\r";
+	static const char * NEW_LINE = "\r\n";
 
     DEBUG_WEBSOCKETS("[WS-Client][sendHeader] sending header...\n\r");
 
@@ -461,14 +461,14 @@ void WebSocketsClient::sendHeader(WSclient_t * client) {
     }
 
 	handshake = WEBSOCKETS_STRING("GET ");
-	handshake += url + WEBSOCKETS_STRING(" HTTP/1.1\r\n\r"
+	handshake += url + WEBSOCKETS_STRING(" HTTP/1.1\r\n"
 			"Host: ");
 	handshake += _host + ":" + _port + NEW_LINE;
 
 	if(ws_header) {
-		handshake += WEBSOCKETS_STRING("Connection: Upgrade\r\n\r"
-				"Upgrade: websocket\r\n\r"
-				"Sec-WebSocket-Version: 13\r\n\r"
+		handshake += WEBSOCKETS_STRING("Connection: Upgrade\r\n"
+				"Upgrade: websocket\r\n"
+				"Sec-WebSocket-Version: 13\r\n"
 				"Sec-WebSocket-Key: ");
 		handshake += client->cKey + NEW_LINE;
 
@@ -482,11 +482,11 @@ void WebSocketsClient::sendHeader(WSclient_t * client) {
 			handshake +=client->cExtensions + NEW_LINE;
 		}
 	} else {
-		handshake += WEBSOCKETS_STRING("Connection: keep-alive\r\n\r");
+		handshake += WEBSOCKETS_STRING("Connection: keep-alive\r\n");
 	}
 
-	handshake += WEBSOCKETS_STRING("Origin: file://\r\n\r"
-			"User-Agent: arduino-WebSocket-Client\r\n\r");
+	handshake += WEBSOCKETS_STRING("Origin: file://\r\n"
+			"User-Agent: arduino-WebSocket-Client\r\n");
 
 	if(client->base64Authorization.length() > 0) {
 		handshake += WEBSOCKETS_STRING("Authorization: Basic ");
@@ -504,7 +504,7 @@ void WebSocketsClient::sendHeader(WSclient_t * client) {
     client->tcp->write((uint8_t*)handshake.c_str(), handshake.length());
 
 #if (WEBSOCKETS_NETWORK_TYPE == NETWORK_ESP8266_ASYNC)
-        client->tcp->readStringUntil('\n\r', &(client->cHttpLine), std::bind(&WebSocketsClient::handleHeader, this, client, &(client->cHttpLine)));
+        client->tcp->readStringUntil('\n', &(client->cHttpLine), std::bind(&WebSocketsClient::handleHeader, this, client, &(client->cHttpLine)));
 #endif
 
     DEBUG_WEBSOCKETS("[WS-Client][sendHeader] sending header... Done (%uus).\n\r", (micros() - start));
@@ -559,7 +559,7 @@ void WebSocketsClient::handleHeader(WSclient_t * client, String * headerLine) {
 
         (*headerLine) = "";
 #if (WEBSOCKETS_NETWORK_TYPE == NETWORK_ESP8266_ASYNC)
-        client->tcp->readStringUntil('\n\r', &(client->cHttpLine), std::bind(&WebSocketsClient::handleHeader, this, client, &(client->cHttpLine)));
+        client->tcp->readStringUntil('\n', &(client->cHttpLine), std::bind(&WebSocketsClient::handleHeader, this, client, &(client->cHttpLine)));
 #endif
 
     } else {
