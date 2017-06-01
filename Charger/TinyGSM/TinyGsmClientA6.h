@@ -349,6 +349,12 @@ public:
   /*
    * GPRS functions
    */
+  bool modemGetConnected(uint8_t mux) { //TODO mux?
+    sendAT(GF("+CIPSTATUS"));
+    int res = waitResponse(GF(",\"CONNECTED\""), GF(",\"CLOSED\""), GF(",\"CLOSING\""), GF(",\"INITIAL\""));
+    waitResponse();
+    return 1 == res;
+  }
   bool gprsConnect(const char* apn, const char* user, const char* pwd, String& ip) {
     gprsDisconnect();
 
@@ -454,12 +460,6 @@ private:
     return len;
   }
 
-  bool modemGetConnected(uint8_t mux) { //TODO mux?
-    sendAT(GF("+CIPSTATUS"));
-    int res = waitResponse(GF(",\"CONNECTED\""), GF(",\"CLOSED\""), GF(",\"CLOSING\""), GF(",\"INITIAL\""));
-    waitResponse();
-    return 1 == res;
-  }
 
   /* Utilities */
   template<typename T>

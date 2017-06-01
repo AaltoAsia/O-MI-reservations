@@ -18,10 +18,28 @@
 #define DatabaseUsers 50
 
 
-#define OMI_HOST "https://otaniemi3d.cs.hut.fi"
+#define OMI_PROTO "http://"
+#define OMI_HOST "otaniemi3d.cs.hut.fi"
 #define OMI_PATH "/omi/node/"
 #define OMI_URL OMI_HOST OMI_PATH
 #define OMI_CERT_FINGERPRINT String("6D 7F AE 98 E6 4A 74 76 45 26 7F 66 14 3C 9F 58 43 CB 09 B5")
+
+
+
+
+///////////////////////
+// PIN CONFIGURATION
+
+// GSM module
+#define SerialAT Serial
+#define DEBUG_ESP_PORT Serial1
+
+#define PIN_GSM_PWR  D2
+#define PIN_LOCK     D6
+#define PIN_SONOFF_RX D5
+#define PIN_SONOFF_TX D0 // TODO: connect or not?
+
+
 
 
 
@@ -61,20 +79,6 @@ const char pass[] = "";
 #include "TinyGSM/TinyGsmClient.h"
 #include "arduinoWebSockets/src/WebSocketsClient.h"
 #define HTTPCLIENT WebSocketsClient
-
-
-///////////////////////
-// PIN CONFIGURATION
-
-// GSM module
-#define SerialAT Serial
-#define DEBUG_ESP_PORT Serial1
-
-#define PIN_GSM_PWR  D2
-#define PIN_LOCK     D6
-#define PIN_SONOFF_RX D5
-#define PIN_SONOFF_TX D0 // TODO: connect or not?
-
 
 
 

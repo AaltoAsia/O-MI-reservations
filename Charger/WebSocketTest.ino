@@ -93,7 +93,7 @@ void setup() {
   delay(1000);
 }
 
-bool modemConnect() {
+bool modemConnect() { // TODO: clean, move to websocket library?
   
   D("Waiting for network...");
   if (!modem.waitForNetwork()) {
@@ -115,14 +115,14 @@ bool modemConnect() {
   DSLN(ip);
 
   // Commented: Connect instead in websocket library?
-  //D("Connecting to ");
-  //D(server);
-  //if (!client.connect(server, 80)) {
-  //  DLN(" fail, retry after 5 secs");
-  //  delay(5000);
-  //  return false;
-  //}
-  //DLN(" CONNECT OK ");
+  D("Connecting to ");
+  D(OMI_HOST);
+  if (!client.connect(OMI_HOST, 80)) {
+    DLN(" fail, retry after 5 secs");
+    delay(5000);
+    return false;
+  }
+  DLN(" CONNECT OK ");
 
   webSocket.onEvent(webSocketEvent);
   yield();

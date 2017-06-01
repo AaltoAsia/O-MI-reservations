@@ -137,12 +137,18 @@ void WebSocketsClient::loop(void) {
         }
 #elif (WEBSOCKETS_NETWORK_TYPE == NETWORK_A7_GSM)
         // nop
+        if (_client.tcp->connected()) {
+            connectedCb();
+        } else {
+            DEBUG_WEBSOCKETS("[WS-Client] Please start connection outside of websockets\n");
+            delay(20);
+        }
 #else
         _client.tcp = new WEBSOCKETS_NETWORK_CLASS();
 #endif
 
         if(!_client.tcp) {
-            DEBUG_WEBSOCKETS("[WS-Client] creating Network class failed!");
+            DEBUG_WEBSOCKETS("[WS-Client] creating Network class failed!\n");
             return;
         }
 
