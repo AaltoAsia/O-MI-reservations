@@ -1,5 +1,3 @@
-// vim: et ts=2 sw=2
-
 #include "Config.h"
 #include "MicroUtil.h"
 #include "types.h"
