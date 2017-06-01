@@ -28,12 +28,13 @@ FLASH_DEF = 4M1M
 # # Serial1 UART1: RX from flash  GPIO 2  D4 (TX)
 
 
-EXTRAFLAGS += -Wall -DWEBSOCKETS_NETWORK_TYPE=NETWORK_A7_GSM
+EXTRAFLAGS += -Wall -DWEBSOCKETS_NETWORK_TYPE=NETWORK_A7_GSM -DDEBUG_ESP_PORT=Serial1
 # -DDEBUG_ESP_PORT=Serial1 -DSWAPSERIAL0 # -DDEBUG_ESP_HTTP_CLIENT
 
+# for different makefile versions
 C_EXTRA += $(EXTRAFLAGS)
 CPP_EXTRA += $(EXTRAFLAGS)
-
+BUILD_EXTRA_FLAGS += $(EXTRAFLAGS)
 
 
 include ./makeEspArduino/makeEspArduino.mk
@@ -47,4 +48,6 @@ addr2line: $(MAIN_EXE)
 
 
 upmon: upload
+	screen $(UPLOAD_PORT) $(MONITOR_SPEED)
+mon:
 	screen $(UPLOAD_PORT) $(MONITOR_SPEED)

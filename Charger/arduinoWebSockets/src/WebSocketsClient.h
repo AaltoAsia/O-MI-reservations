@@ -79,6 +79,8 @@ class WebSocketsClient: private WebSockets {
         void setAuthorization(const char * user, const char * password);
         void setAuthorization(const char * auth);
 
+        void connectedCb();
+
     protected:
         String _host;
         uint16_t _port;
@@ -102,7 +104,6 @@ class WebSocketsClient: private WebSockets {
         void sendHeader(WSclient_t * client);
         void handleHeader(WSclient_t * client, String * headerLine);
 
-        void connectedCb();
         void connectFailedCb();
 
 #if (WEBSOCKETS_NETWORK_TYPE == NETWORK_ESP8266_ASYNC)
