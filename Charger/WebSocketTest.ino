@@ -1,3 +1,6 @@
+// vim settings:
+// vim: et ts=2 sw=2
+
 #include "Config.h"
 #include "MicroUtil.h"
 #include "types.h"
@@ -24,12 +27,12 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
 
     switch(type) {
         case WStype_DISCONNECTED:
-            DFORMAT("[WSc] Disconnected!\n");
+            DFORMAT("[WSc] Disconnected!\n\r");
             isConnected = false;
             break;
         case WStype_CONNECTED:
             {
-                DFORMAT("[WSc] Connected to url: %s\n",  payload);
+                DFORMAT("[WSc] Connected to url: %s\n\r",  payload);
                 isConnected = true;
 
 			    // send message to server when Connected
@@ -38,13 +41,13 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
             }
             break;
         case WStype_TEXT:
-            DFORMAT("[WSc] get text: %s\n", payload);
+            DFORMAT("[WSc] get text: %s\n\r", payload);
 
 			// send message to server
 			// webSocket.sendTXT("message here");
             break;
         case WStype_BIN:
-            DFORMAT("[WSc] get binary length: %u\n", length);
+            DFORMAT("[WSc] get binary length: %u\n\r", length);
             hexdump(payload, length);
 
             // send data to server
