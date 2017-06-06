@@ -342,8 +342,8 @@ void WebSocketsClient::clientDisconnect(WSclient_t * client) {
         //nop
 #else
         delete client->tcp;
-#endif
         client->tcp = NULL;
+#endif
     }
 
     client->cCode = 0;
@@ -518,9 +518,11 @@ void WebSocketsClient::sendHeader(WSclient_t * client) {
 void WebSocketsClient::handleHeader(WSclient_t * client, String * headerLine) {
 
     headerLine->trim(); // remove \r
+    //DEBUG_WEBSOCKETS("[WS-Client][handleHeader] Input: %s\r\n", headerLine->c_str());
 
     if(headerLine->length() > 0) {
         DEBUG_WEBSOCKETS("[WS-Client][handleHeader] RX: %s\n\r", headerLine->c_str());
+        DEBUG_ESP_PORT.flush();
 
         if(headerLine->startsWith(WEBSOCKETS_STRING("HTTP/1."))) {
             // "HTTP/1.1 101 Switching Protocols"
@@ -558,6 +560,9 @@ void WebSocketsClient::handleHeader(WSclient_t * client, String * headerLine) {
         }
 
         (*headerLine) = "";
+#if (WEBSOCKETS_NETWORK_TYPE == NETWORK_A7_GSM)
+//        bool ok = (client->cIsUpgrade && client->cIsWebsocket && client->);
+#endif
 #if (WEBSOCKETS_NETWORK_TYPE == NETWORK_ESP8266_ASYNC)
         client->tcp->readStringUntil('\n', &(client->cHttpLine), std::bind(&WebSocketsClient::handleHeader, this, client, &(client->cHttpLine)));
 #endif
@@ -584,6 +589,7 @@ void WebSocketsClient::handleHeader(WSclient_t * client, String * headerLine) {
         if(ok) {
             switch(client->cCode) {
                 case 101:  ///< Switching Protocols
+                    DEBUG_WEBSOCKETS("[WS-Client][handleHeader] switching protocols\n\r");
 
                     break;
                 case 200:
@@ -603,10 +609,12 @@ void WebSocketsClient::handleHeader(WSclient_t * client, String * headerLine) {
         if(ok) {
 
             if(client->cAccept.length() == 0) {
+                DEBUG_WEBSOCKETS("[WS-Client][handleHeader] error: cAccept length == 0\n\r");
                 ok = false;
             } else {
                 // generate Sec-WebSocket-Accept key for check
                 String sKey = acceptKey(client->cKey);
+                DEBUG_WEBSOCKETS("[WS-Client][handleHeader] acceptKey our: %s, client: %s\n\r", sKey.c_str(), client->cAccept.c_str());
                 if(sKey != client->cAccept) {
                     DEBUG_WEBSOCKETS("[WS-Client][handleHeader] Sec-WebSocket-Accept is wrong\n\r");
                     ok = false;

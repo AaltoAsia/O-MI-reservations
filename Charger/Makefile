@@ -1,6 +1,6 @@
 SKETCH = WebSocketTest.ino
 
-#ESP_ROOT ?= //linux icin dosya direction yap
+ESP_ROOT ?= $(HOME)/Arduino/esp8266/
 
 #LIBS += $(ESP_LIBS)/ESP8266WiFi \
 #	$(ESP_LIBS)/ESP8266HTTPClient \
@@ -11,7 +11,7 @@ SKETCH = WebSocketTest.ino
 
 	#$(ESP_LIBS)/ESP8266httpUpdate \
 
-UPLOAD_PORT = COM8
+UPLOAD_PORT = /dev/ttyUSB0
 UPLOAD_SPEED  = 921600
 MONITOR_SPEED = 115200
 BOARD = d1_mini

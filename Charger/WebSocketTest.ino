@@ -171,6 +171,7 @@ void loop() {
 
   while (isConnected) {
     webSocket.loop();
+    DFORMAT("RAM Memory left: %d\r\n", ESP.getFreeHeap());
   
     uint64_t now = millis();
 

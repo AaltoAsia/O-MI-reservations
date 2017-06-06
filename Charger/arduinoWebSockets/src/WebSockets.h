@@ -46,7 +46,7 @@
 #endif
 
 #ifdef ESP8266
-#   define WEBSOCKETS_MAX_DATA_SIZE  (15*1024)
+#   define WEBSOCKETS_MAX_DATA_SIZE  (17*1024)
 #   define WEBSOCKETS_USE_BIG_MEM
 #   define GET_FREE_HEAP ESP.getFreeHeap()
 // moves all Header strings to Flash (~300 Byte)
