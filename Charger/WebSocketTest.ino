@@ -21,6 +21,41 @@ WebSocketsClient webSocket;
 uint64_t messageTimestamp = 0;
 uint64_t heartbeatTimestamp = 0;
 bool isConnected = false;
+bool isSubscribed = false;
+
+
+const char* PoleSubscriptionRequest = 
+"<omiEnvelope xmlns=\"http://www.opengroup.org/xsd/omi/1.0/\" version=\"1.0\" ttl=\"-1\">"
+ "<read msgformat=\"odf\" interval=\"-1\" callback=\"0\">"
+   "<msg>"
+     "<Objects xmlns=\"http://www.opengroup.org/xsd/odf/1.0/\">"
+       "<Object>"
+         "<id>ParkingService</id>"
+         "<Object>"
+           "<id>ParkingFacilities</id>"
+           "<Object>"
+             "<id>CSBuildingParkingLot</id>"
+             "<Object>"
+               "<id>ParkingSpaceTypes</id>"
+               "<Object>"
+                 "<id>ElectricVehicleParkingSpace</id>"
+                 "<Object>"
+                   "<id>Spaces</id>"
+                   "<Object>"
+                     "<id>EVSpace1</id>"
+                     "<InfoItem name=\"OpenLid\"/>"
+                   "</Object>"
+                 "</Object>"
+               "</Object>"
+             "</Object>"
+           "</Object>"
+         "</Object>"
+       "</Object>"
+     "</Objects>"
+   "</msg>"
+ "</read>"
+"</omiEnvelope>" ;
+
 
 void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
 
@@ -35,9 +70,8 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
                 DFORMAT("[WSc] Connected to url: %s\n\r",  payload);
                 isConnected = true;
 
-			    // send message to server when Connected
-                // socket.io upgrade confirmation message (required)
-				webSocket.sendTXT("5");
+                DLN("Sending Subscription");
+                isSubscribed = false;
             }
             break;
         case WStype_TEXT:
@@ -135,7 +169,6 @@ bool modemConnect() { // TODO: clean, move to websocket library?
 
 
 
-
 void loop() {
     
   // if not connected try to connect
@@ -144,19 +177,6 @@ void loop() {
   }
 
 
-  const char* testRead = 
-  "<omi:omiEnvelope xmlns:omi=\"omi.xsd\" version=\"1.0\" ttl=\"50\">"
-    "<omi:read msgformat=\"odf\">"
-      "<omi:msg>"
-        "<Objects xmlns=\"odf.xsd\">"
-          "<Object>"
-            "<id>SmartHouse</id>"
-            "<InfoItem name=\"FrontDoor\"/>"
-          "</Object>"
-        "</Objects>"
-      "</omi:msg>"
-    "</omi:read>"
-  "</omi:omiEnvelope>";
 
   for (int wait = 0; wait < 15 && !isConnected; wait++) {
     DLN("Waiting for connection.");
@@ -171,16 +191,15 @@ void loop() {
 
   while (isConnected) {
     webSocket.loop();
-    DFORMAT("RAM Memory left: %d\r\n", ESP.getFreeHeap());
-  
+    //DFORMAT("RAM Memory left: %d\r\n", ESP.getFreeHeap());
+
+    if (! isSubscribed) {
+      webSocket.sendTXT(PoleSubscriptionRequest);
+      isSubscribed = true; // TODO: Check response success
+    }
+
     uint64_t now = millis();
 
-    if(now - messageTimestamp > MESSAGE_INTERVAL) {
-      messageTimestamp = now;
-
-      DLN("Sending testRead");
-      webSocket.sendTXT(testRead);
-    }
     if((now - heartbeatTimestamp) > HEARTBEAT_INTERVAL) {
       heartbeatTimestamp = now;
 
