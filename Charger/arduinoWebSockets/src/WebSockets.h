@@ -49,6 +49,7 @@
 #   define WEBSOCKETS_MAX_DATA_SIZE  (17*1024)
 #   define WEBSOCKETS_USE_BIG_MEM
 #   define GET_FREE_HEAP ESP.getFreeHeap()
+#include <ESP8266WiFi.h>
 // moves all Header strings to Flash (~300 Byte)
 //# define WEBSOCKETS_SAVE_RAM
 #else

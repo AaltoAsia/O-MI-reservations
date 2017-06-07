@@ -26,7 +26,7 @@
 #define WEBSOCKETSCLIENT_H_
 
 #include "WebSockets.h"
-
+#include <ESP8266WiFi.h>
 class WebSocketsClient: private WebSockets {
     public:
 #ifdef __AVR__

@@ -26,6 +26,7 @@
 
 #ifdef ESP8266
 #include <core_esp8266_features.h>
+#include <ESP8266WiFi.h>
 #endif
 
 extern "C" {

@@ -24,7 +24,7 @@
 
 #include "WebSockets.h"
 #include "WebSocketsClient.h"
-
+#include <ESP8266WiFi.h>
 
 WebSocketsClient::WebSocketsClient() {
     _cbEvent = NULL;

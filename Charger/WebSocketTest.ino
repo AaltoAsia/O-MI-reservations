@@ -22,8 +22,8 @@ uint64_t messageTimestamp = 0;
 uint64_t heartbeatTimestamp = 0;
 bool isConnected = false;
 bool isSubscribed = false;
-
-
+volatile int a;
+WStype_t state;
 const char* PoleSubscriptionRequest = 
 "<omiEnvelope xmlns=\"http://www.opengroup.org/xsd/omi/1.0/\" version=\"1.0\" ttl=\"-1\">"
  "<read msgformat=\"odf\" interval=\"-1\" callback=\"0\">"
@@ -58,6 +58,28 @@ const char* PoleSubscriptionRequest =
 "</omiEnvelope>" ;
 
 
+void reconnect(void){
+ DLN("Initializing modem...");
+  // BOOT GSM
+  pinMode(PIN_GSM_PWR, OUTPUT);
+  D("PWR");
+  digitalWrite(PIN_GSM_PWR, HIGH);
+  D(".HIGH");
+  delay(4000);
+  D("DONE");
+  digitalWrite(PIN_GSM_PWR, LOW);
+  D(".LOW");
+  delay(500);
+  DLN(".INIT...");
+  modem.init();
+	    
+  yield();
+  webSocket.begin(&client, OMI_HOST, 80, OMI_PATH, "omi");
+  yield();
+  webSocket.connectedCb();
+
+}
+
 void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
 
 
@@ -65,14 +87,18 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
         case WStype_DISCONNECTED:
             DFORMAT("[WSc] Disconnected!\n\r");
             isConnected = false;
+          //  state=type;
+           reconnect();
+       
             break;
         case WStype_CONNECTED:
             {
                 DFORMAT("[WSc] Connected to url: %s\n\r",  payload);
                 isConnected = true;
-
+            //state=type;
                 DLN("Sending Subscription");
                 isSubscribed = false;
+                a=1;
             }
             break;
         case WStype_TEXT:
@@ -91,6 +117,9 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
     }
 
 }
+
+
+
 
 void setup() {
 
@@ -171,7 +200,7 @@ bool modemConnect() { // TODO: clean, move to websocket library?
 
 
 void loop() {
-    
+    DFORMAT("==state==: %d\r\n",a);
   // if not connected try to connect
   if (!client.connected()) {
     if (!modemConnect()) return;
