@@ -148,6 +148,8 @@ void setup() {
   digitalWrite(PIN_LOCK, LOW);
   pinMode(PIN_GSM_PWR, OUTPUT);
   digitalWrite(PIN_GSM_PWR, LOW);
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, HIGH);
 
 
   // BOOT GSM
@@ -214,9 +216,11 @@ void reconnect(void){
   modemConnect();
 }
 
-unsigned tmp = 0, tmpb = 0;
 
 void loop() {
+  if (isConnected) {
+    digitalWrite(LED_BUILTIN, HIGH);
+  }
 
   DFORMAT("==state==: %d\r\n",a);
   // if not connected try to connect
@@ -235,7 +239,9 @@ void loop() {
     }
   }
 
-
+  if (isConnected) {
+    digitalWrite(LED_BUILTIN, LOW);
+  }
 
 
   while (isConnected) {
@@ -245,6 +251,7 @@ void loop() {
       isXml = false;
       String value;
       String item;
+      unsigned tmp = 0, tmpb = 0;
       //GetValueOfItem(LidStatusName, responsePayload, value)
       if (findInfoItem(responsePayload, LidStatusName, item, tmp)) {
         if (findValue(item, value, tmpb)) {
