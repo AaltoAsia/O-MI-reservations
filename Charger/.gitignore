@@ -1,0 +1,7 @@
+# Don't commit Makefile modifications unless they are needed by others
+Makefile
+
+# desktop.ini etc
+*.ini
+thumbs.db
+

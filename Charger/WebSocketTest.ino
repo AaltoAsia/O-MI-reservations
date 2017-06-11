@@ -4,10 +4,12 @@
 #include "Config.h"
 #include "MicroUtil.h"
 #include "types.h"
+#include "OMIProcessing.h"
 #include <ESP8266WiFi.h>
 #include <Hash.h>
 
-
+void reconnect();
+bool modemConnect();
 
 TinyGsm modem(SerialAT);
 TinyGsmClient client(modem);
@@ -17,68 +19,74 @@ WebSocketsClient webSocket;
 
 #define MESSAGE_INTERVAL 35000
 #define HEARTBEAT_INTERVAL 28000
+#define RESPONSE_BUFFER 5120
 
-uint64_t messageTimestamp = 0;
-uint64_t heartbeatTimestamp = 0;
-bool isConnected = false;
-bool isSubscribed = false;
-volatile int a;
-WStype_t state;
+#define LidStatusName FString("LidStatus")
+
+#define GetValueOfItem(name, object, value) \
+                tmp = 0; tmpb = 0; \
+                if (!(findInfoItem((object), (name), item, tmp) \
+                            && findValue(item, (value), tmpb))) { \
+                    D("[OMIreserve] Error: Cannot parse "); DS(name); \
+                    continue; \
+                }
+
+
+class StringBuffer : public String {
+public:
+  StringBuffer() : String() {}
+  inline StringBuffer & copy_cstr(const char *cstr, unsigned int length) {
+    this->copy(cstr,length);
+    return *this;
+  }
+};
+
 const char* PoleSubscriptionRequest = 
-"<omiEnvelope xmlns=\"http://www.opengroup.org/xsd/omi/1.0/\" version=\"1.0\" ttl=\"-1\">"
- "<read msgformat=\"odf\" interval=\"-1\" callback=\"0\">"
-   "<msg>"
-     "<Objects xmlns=\"http://www.opengroup.org/xsd/odf/1.0/\">"
-       "<Object>"
-         "<id>ParkingService</id>"
+  "<omiEnvelope xmlns=\"http://www.opengroup.org/xsd/omi/1.0/\" version=\"1.0\" ttl=\"-1\">"
+   "<read msgformat=\"odf\" interval=\"-1\" callback=\"0\">"
+     "<msg>"
+       "<Objects xmlns=\"http://www.opengroup.org/xsd/odf/1.0/\">"
          "<Object>"
-           "<id>ParkingFacilities</id>"
+           "<id>ParkingService</id>"
            "<Object>"
-             "<id>CSBuildingParkingLot</id>"
+             "<id>ParkingFacilities</id>"
              "<Object>"
-               "<id>ParkingSpaceTypes</id>"
+               "<id>DipoliParkingLot</id>"
                "<Object>"
-                 "<id>ElectricVehicleParkingSpace</id>"
+                 "<id>ParkingSpaceTypes</id>"
                  "<Object>"
-                   "<id>Spaces</id>"
+                   "<id>ElectricVehicleParkingSpace</id>"
                    "<Object>"
-                     "<id>EVSpace1</id>"
-                     "<InfoItem name=\"LidStatus\"/>"
-                     "<InfoItem name=\"Available\"/>"
+                     "<id>Spaces</id>"
+                     "<Object>"
+                       "<id>EVSpace2</id>"
+                       "<InfoItem name=\"Available\"/>"
+                       "<Object>"
+                         "<id>Charger</id>"
+                         "<InfoItem name=\"LidStatus\"/>"
+                       "</Object>"
+                     "</Object>"
                    "</Object>"
                  "</Object>"
                "</Object>"
              "</Object>"
            "</Object>"
          "</Object>"
-       "</Object>"
-     "</Objects>"
-   "</msg>"
- "</read>"
-"</omiEnvelope>" ;
+       "</Objects>"
+     "</msg>"
+   "</read>"
+  "</omiEnvelope>" ;
 
+uint64_t messageTimestamp = 0;
+uint64_t heartbeatTimestamp = 0;
+bool isConnected = false;
+bool isSubscribed = false;
+bool isXml = false;
+volatile int a;
+WStype_t state;
 
-void reconnect(void){
- DLN("Initializing modem...");
-  // BOOT GSM
-  pinMode(PIN_GSM_PWR, OUTPUT);
-  D("PWR");
-  digitalWrite(PIN_GSM_PWR, HIGH);
-  D(".HIGH");
-  delay(4000);
-  D("DONE");
-  digitalWrite(PIN_GSM_PWR, LOW);
-  D(".LOW");
-  delay(500);
-  DLN(".INIT...");
-  modem.init();
-	    
-  yield();
-  webSocket.begin(&client, OMI_HOST, 80, OMI_PATH, "omi");
-  yield();
-  webSocket.connectedCb();
+StringBuffer responsePayload;
 
-}
 
 void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
 
@@ -102,10 +110,11 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
             }
             break;
         case WStype_TEXT:
-            DFORMAT("[WSc] get text: %s\n\r", payload);
-
-			// send message to server
-			// webSocket.sendTXT("message here");
+            if (length > 0) {
+              DFORMAT("[WSc] get text: %s\n\r", payload);
+              isXml = true;
+              responsePayload.copy_cstr((const char *) payload, length);
+            }
             break;
         case WStype_BIN:
             DFORMAT("[WSc] get binary length: %u\n\r", length);
@@ -122,6 +131,7 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
 
 
 void setup() {
+  responsePayload.reserve(RESPONSE_BUFFER);
 
   // Set console baud rate
   DEBUG_PORT.begin(115200);
@@ -133,29 +143,29 @@ void setup() {
   SerialAT.swap();
   delay(5000);
 
-  // Restart takes quite some time
-  // To skip it, call init() instead of restart()
-  DLN("Initializing modem...");
-  // BOOT GSM
+  // PINS
+  pinMode(PIN_LOCK, OUTPUT);
+  digitalWrite(PIN_LOCK, LOW);
   pinMode(PIN_GSM_PWR, OUTPUT);
+  digitalWrite(PIN_GSM_PWR, LOW);
+
+
+  // BOOT GSM
+  delay(50);
   D("PWR");
   digitalWrite(PIN_GSM_PWR, HIGH);
   D(".HIGH");
-  delay(4000);
+  delay(3200);
   D("DONE");
   digitalWrite(PIN_GSM_PWR, LOW);
   D(".LOW");
-  delay(500);
+  delay(300);
   DLN(".INIT...");
-  modem.init();
-  //while (!modem.restart()){
-  //  DLN("FAIL");
-  //  delay(5000);
-  //  DLN("Initializing modem...");
-  //}
 
-  DLN("Done");
-  delay(1000);
+
+  modem.init();
+	yield();    
+  modemConnect();
 }
 
 bool modemConnect() { // TODO: clean, move to websocket library?
@@ -197,13 +207,22 @@ bool modemConnect() { // TODO: clean, move to websocket library?
 }
 
 
+void reconnect(void){
+  DLN("Initializing modem...");
+  modem.init();
+	yield();    
+  modemConnect();
+}
 
+unsigned tmp = 0, tmpb = 0;
 
 void loop() {
-    DFORMAT("==state==: %d\r\n",a);
+
+  DFORMAT("==state==: %d\r\n",a);
   // if not connected try to connect
   if (!client.connected()) {
-    if (!modemConnect()) return;
+    //if (!reconnect()) return;
+    reconnect();
   }
 
 
@@ -221,6 +240,21 @@ void loop() {
 
   while (isConnected) {
     webSocket.loop();
+
+    if (isXml) {
+      isXml = false;
+      String value;
+      String item;
+      //GetValueOfItem(LidStatusName, responsePayload, value)
+      if (findInfoItem(responsePayload, LidStatusName, item, tmp)) {
+        if (findValue(item, value, tmpb)) {
+          DFORMAT("Result: %s", value.c_str());
+        }
+        digitalWrite(PIN_LOCK, HIGH);
+        delay(2000);
+        digitalWrite(PIN_LOCK, LOW);
+      }
+    }
     //DFORMAT("RAM Memory left: %d\r\n", ESP.getFreeHeap());
 
     if (! isSubscribed) {

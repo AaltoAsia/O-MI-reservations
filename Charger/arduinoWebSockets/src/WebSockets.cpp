@@ -395,6 +395,7 @@ void WebSockets::handleWebsocketCb(WSclient_t * client) {
     if(header->payloadLen > 0) {
         // if text data we need one more
         payload = (uint8_t *) malloc(header->payloadLen + 1);
+        payload[header->payloadLen] = 0x00; // TK: FIXD
 
         if(!payload) {
             DEBUG_WEBSOCKETS("[WS][%d][handleWebsocket] to less memory to handle payload %d!\n", client->num, header->payloadLen);
@@ -409,7 +410,9 @@ void WebSockets::handleWebsocketCb(WSclient_t * client) {
 
 void WebSockets::handleWebsocketPayloadCb(WSclient_t * client, bool ok, uint8_t * payload) {
 
+    DEBUG_WEBSOCKETS("[WS] handleWebsocketPayloadCb \n");
     WSMessageHeader_t * header = &client->cWsHeaderDecode;
+    DEBUG_WEBSOCKETS("[WS] len %d\n", header->payloadLen);
     if(ok) {
         if(header->payloadLen > 0) {
             payload[header->payloadLen] = 0x00;
@@ -422,9 +425,15 @@ void WebSockets::handleWebsocketPayloadCb(WSclient_t * client, bool ok, uint8_t 
             }
         }
 
+        DEBUG_WEBSOCKETS("[WS] opcode %d\n", header->opCode);
         switch(header->opCode) {
             case WSop_text:
-                DEBUG_WEBSOCKETS("[WS][%d][handleWebsocket] text: %s\n", client->num, payload);
+                if(header->payloadLen > 0) {
+                    DEBUG_WEBSOCKETS("[WS][%d][handleWebsocket] text: %s\n", client->num, payload);
+                } else {
+                    DEBUG_WEBSOCKETS("[WS][%d][handleWebsocket] empty text\n", client->num);
+                }
+                DEBUG_ESP_PORT.flush();
                 // no break here!
             case WSop_binary:
             case WSop_continuation:

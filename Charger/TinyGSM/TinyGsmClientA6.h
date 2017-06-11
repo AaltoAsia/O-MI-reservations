@@ -12,7 +12,7 @@
 //#define TINY_GSM_DEBUG Serial
 
 #if !defined(TINY_GSM_RX_BUFFER)
-  #define TINY_GSM_RX_BUFFER 1024
+  #define TINY_GSM_RX_BUFFER 5120
 #endif
 
 #include <TinyGsmCommon.h>
