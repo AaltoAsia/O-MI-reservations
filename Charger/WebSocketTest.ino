@@ -148,8 +148,6 @@ void setup() {
   digitalWrite(PIN_LOCK, LOW);
   pinMode(PIN_GSM_PWR, OUTPUT);
   digitalWrite(PIN_GSM_PWR, LOW);
-  pinMode(LED_BUILTIN, OUTPUT);
-  digitalWrite(LED_BUILTIN, HIGH);
 
 
   // BOOT GSM
@@ -218,9 +216,6 @@ void reconnect(void){
 
 
 void loop() {
-  if (isConnected) {
-    digitalWrite(LED_BUILTIN, HIGH);
-  }
 
   DFORMAT("==state==: %d\r\n",a);
   // if not connected try to connect
@@ -239,9 +234,6 @@ void loop() {
     }
   }
 
-  if (isConnected) {
-    digitalWrite(LED_BUILTIN, LOW);
-  }
 
 
   while (isConnected) {
