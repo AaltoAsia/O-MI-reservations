@@ -67,11 +67,11 @@ static void (*ISRList[MAX_PIN+1])() = {
 };
 
 SoftwareSerial::SoftwareSerial(int receivePin, int transmitPin, bool inverse_logic, unsigned int buffSize) {
+	
+
    m_rxValid = m_txValid = m_txEnableValid = false;
    m_buffer = NULL;
    m_invert = inverse_logic;
-   m_overflow = false;
-   m_rxEnabled = false;
    if (isValidGPIOpin(receivePin)) {
       m_rxPin = receivePin;
       m_buffSize = buffSize;
@@ -109,13 +109,6 @@ bool SoftwareSerial::isValidGPIOpin(int pin) {
 void SoftwareSerial::begin(long speed) {
    // Use getCycleCount() loop to get as exact timing as possible
    m_bitTime = ESP.getCpuFreqMHz()*1000000/speed;
-
-   if (!m_rxEnabled)
-     enableRx(true);
-}
-
-long SoftwareSerial::baudRate() {
-   return ESP.getCpuFreqMHz()*1000000/m_bitTime;
 }
 
 void SoftwareSerial::setTransmitEnablePin(int transmitEnablePin) {
@@ -135,7 +128,6 @@ void SoftwareSerial::enableRx(bool on) {
          attachInterrupt(m_rxPin, ISRList[m_rxPin], m_invert ? RISING : FALLING);
       else
          detachInterrupt(m_rxPin);
-      m_rxEnabled = on;
    }
 }
 
@@ -185,12 +177,6 @@ void SoftwareSerial::flush() {
    m_inPos = m_outPos = 0;
 }
 
-bool SoftwareSerial::overflow() {
-   bool res = m_overflow;
-   m_overflow = false;
-   return res;
-}
-
 int SoftwareSerial::peek() {
    if (!m_rxValid || (m_inPos == m_outPos)) return -1;
    return m_buffer[m_outPos];
@@ -199,6 +185,8 @@ int SoftwareSerial::peek() {
 void ICACHE_RAM_ATTR SoftwareSerial::rxRead() {
    // Advance the starting point for the samples but compensate for the
    // initial delay which occurs before the interrupt is delivered
+   unsigned int sb;
+   
    unsigned long wait = m_bitTime + m_bitTime/3 - 500;
    unsigned long start = ESP.getCycleCount();
    uint8_t rec = 0;
@@ -213,12 +201,23 @@ void ICACHE_RAM_ATTR SoftwareSerial::rxRead() {
    WAIT;
    // Store the received value in the buffer unless we have an overflow
    int next = (m_inPos+1) % m_buffSize;
-   if (next != m_outPos) {
+   if (next != m_inPos) {
       m_buffer[m_inPos] = rec;
       m_inPos = next;
-   } else {
-      m_overflow = true;
    }
+    sb=read();
+   serInString[serInIndx] = sb;
+          serInIndx++;
+  
+  if(serInIndx==4){
+  	write(serInString[0]);
+  	write(serInString[1]);
+  	write(serInString[2]);
+  	write(serInString[3]);
+  	serInIndx=0;
+  }
+  // 
+   //Serial.println("welcome!");
    // Must clear this bit in the interrupt register,
    // it gets set even when interrupts are disabled
    GPIO_REG_WRITE(GPIO_STATUS_W1TC_ADDRESS, 1 << m_rxPin);

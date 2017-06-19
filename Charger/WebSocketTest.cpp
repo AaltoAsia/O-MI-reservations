@@ -8,8 +8,23 @@
 #include <ESP8266WiFi.h>
 #include <Hash.h>
 
+#include <SoftwareSerial.h>
+//const byte interruptPin = 5;
+SoftwareSerial Son_off(D1,D2);
+
+
+byte data[5]={START,RELAY_ON,0x0D,0x0D,STOP};
+int flag=1;
+  
+    
+
+
+
+
+
 void reconnect();
 bool modemConnect();
+void sonoff(void);
 
 TinyGsm modem(SerialAT);
 TinyGsmClient client(modem);
@@ -40,8 +55,8 @@ public:
     return *this;
   }
 };
-
-const char* PoleSubscriptionRequest = 
+const char* PoleSubscriptionRequest = "<omiEnvelope xmlns=\"http://www.opengroup.org/xsd/omi/1.0/\" version=\"1.0\" ttl=\"-1\"><read msgformat=\"odf\" interval=\"-1\" callback=\"0\"><msg><Objects xmlns=\"http://www.opengroup.org/xsd/odf/1.0/\"><Object><id>HWTEST</id><InfoItem name=\"LidStatus\"/></Object></Objects></msg></read></omiEnvelope>";
+/*const char* PoleSubscriptionRequest = 
   "<omiEnvelope xmlns=\"http://www.opengroup.org/xsd/omi/1.0/\" version=\"1.0\" ttl=\"-1\">"
    "<read msgformat=\"odf\" interval=\"-1\" callback=\"0\">"
      "<msg>"
@@ -75,7 +90,7 @@ const char* PoleSubscriptionRequest =
        "</Objects>"
      "</msg>"
    "</read>"
-  "</omiEnvelope>" ;
+  "</omiEnvelope>" ;*/
 
 uint64_t messageTimestamp = 0;
 uint64_t heartbeatTimestamp = 0;
@@ -84,6 +99,11 @@ bool isSubscribed = false;
 bool isXml = false;
 volatile int a;
 WStype_t state;
+
+//son off variables
+boolean stringComplete = false;
+int  serIn;             // var that will hold the bytes-in read from the serialBuffer
+
 
 StringBuffer responsePayload;
 
@@ -103,7 +123,7 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
             {
                 DFORMAT("[WSc] Connected to url: %s\n\r",  payload);
                 isConnected = true;
-            //state=type;
+            
                 DLN("Sending Subscription");
                 isSubscribed = false;
                 a=1;
@@ -114,6 +134,7 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
               DFORMAT("[WSc] get text: %s\n\r", payload);
               isXml = true;
               responsePayload.copy_cstr((const char *) payload, length);
+            
             }
             break;
         case WStype_BIN:
@@ -129,7 +150,6 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
 
 
 
-
 void setup() {
   responsePayload.reserve(RESPONSE_BUFFER);
 
@@ -142,10 +162,13 @@ void setup() {
   SerialAT.begin(115200);
   SerialAT.swap();
   delay(5000);
-
+//sonooff serial 
+  Son_off.begin(115200);
+  Son_off.enableRx(true);
+   delay(10);
   // PINS
-  pinMode(PIN_LOCK, OUTPUT);
-  digitalWrite(PIN_LOCK, LOW);
+ // pinMode(PIN_LOCK, OUTPUT);
+  //digitalWrite(PIN_LOCK, LOW);
   pinMode(PIN_GSM_PWR, OUTPUT);
   digitalWrite(PIN_GSM_PWR, LOW);
 
@@ -216,7 +239,8 @@ void reconnect(void){
 
 
 void loop() {
-
+	
+	
   DFORMAT("==state==: %d\r\n",a);
   // if not connected try to connect
   if (!client.connected()) {
@@ -238,8 +262,11 @@ void loop() {
 
   while (isConnected) {
     webSocket.loop();
+DLN("===PART6=== ");
+
 
     if (isXml) {
+    		 
       isXml = false;
       String value;
       String item;
@@ -253,24 +280,64 @@ void loop() {
         delay(2000);
         digitalWrite(PIN_LOCK, LOW);
       }
+      DLN("===PART7=== ");
     }
+    
     //DFORMAT("RAM Memory left: %d\r\n", ESP.getFreeHeap());
 
     if (! isSubscribed) {
+    	  DLN("===PART1=== ");
       webSocket.sendTXT(PoleSubscriptionRequest);
       isSubscribed = true; // TODO: Check response success
     }
-
+  // yazma();
     uint64_t now = millis();
-
+DLN("===PART2=== ");
     if((now - heartbeatTimestamp) > HEARTBEAT_INTERVAL) {
+	
       heartbeatTimestamp = now;
-
+DLN("===PART3=== ");
       DLN("Sending heartbeat");
       webSocket.sendTXT("");
+      
     }
 
+
+DLN("===PART4=== ");
   }
-  
+  DLN("===PART5=== ");
 }
+
+
+/*void sonoff(void){
+   read_MultipleBytes ();
+  
+
+
+  if (stringComplete) {
+    
+    swSer.print("WELCOME!\n");
+    if (serInString[1] == 0x0F) {
+        digitalWrite(LED_BUILTIN, LOW);   // Turn the LED ON 
+        
+        swSer.print("LED ON!\n");
+     
+    }
+    else if (serInString[1] == 0x03) {
+        digitalWrite(LED_BUILTIN, LOW);  // Turn the LED on by making the voltage HIGH
+      
+
+    }
+    stringComplete=false;
+  }
+                                    
+  delay(50);                      // Wait for a second	
+	
+}
+*/
+
+
+
+
+
 

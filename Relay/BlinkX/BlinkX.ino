@@ -10,34 +10,66 @@
 */
 #define LED 13
 #define RELAY 12
+#define BUTTON 14
+#define START 0xAA
+#define CURRENT_VALUE 0x00
+#define POWER_VALUE 0x00
+#define RELAY_ON 0x0F
+#define RELAY_OFF 0x03
+#define STOP 0xAA
+
+
+byte data[5]={START,RELAY_ON,0x0D,0x0D,STOP};
+int flag=1;
+    
+
+
 
 void setup() {
   Serial.begin(115200);     // Initialize the LED_BUILTIN pin as an output
   pinMode(LED, OUTPUT);
   digitalWrite(LED, HIGH);  // Turn the LED off by making the voltage HIGH
-
+  pinMode(BUTTON, INPUT);
+  digitalWrite(BUTTON, LOW);  // Turn the LED off by making the voltage HIGH
+  
   pinMode(RELAY, OUTPUT);
   
   delay(3000);                      // Wait for two seconds (to demonstrate the active low LED)
-  Serial.print("Hello World!\n");
+//  Serial.print("Hello World!\n");
 }
 
 // the loop function runs over and over again forever
 void loop() {
-  if (Serial.available()) {
-    char c = Serial.read();
-    if (c == 'I') {
-        digitalWrite(LED, LOW);   // Turn the LED on (Note that LOW is the voltage level
-        digitalWrite(RELAY, HIGH);
-    }
-    else if (c == 'O') {
-        digitalWrite(LED, HIGH);  // Turn the LED off by making the voltage HIGH
-        digitalWrite(RELAY, LOW);
+if(digitalRead(BUTTON)==HIGH){
+ // digitalWrite(LED_BUILTIN, HIGH);// Ledi yak
+  digitalWrite(LED, LOW);
 
-    }
+  if(flag==1){
+    flag=0;
+    data[1]=RELAY_ON;
+    }else{
+      flag=1;
+      data[1]=RELAY_OFF;
+      }
+ for(int i=0;i<5;i++){
+   Serial.write(data[i]);
   }
-                                    // but actually the LED is on; this is because 
-                                    // it is acive low on the ESP-01)
-  delay(50);                      // Wait for a second
+
+    
+  
+  delay(3000);
+  }
+  else{
+     digitalWrite(LED, HIGH);
+  //digitalWrite(LED_BUILTIN, LOW);// Ledi yak
+
+  }
+
+  
+  
+
 
 }
+
+
+

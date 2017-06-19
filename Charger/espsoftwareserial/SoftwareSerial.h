@@ -68,6 +68,8 @@ private:
    bool isValidGPIOpin(int pin);
 
    // Member variables
+    byte serInString[4];
+   int  serInIndx  = 0;
    int m_rxPin, m_txPin, m_txEnablePin;
    bool m_rxValid, m_rxEnabled;
    bool m_txValid, m_txEnableValid;

@@ -1,4 +1,4 @@
-SKETCH = WebSocketTest.ino
+SKETCH = WebSocketTest.cpp
 
 #ESP_ROOT ?= $(HOME)/Arduino/esp8266/
 
