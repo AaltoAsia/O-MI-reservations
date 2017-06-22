@@ -39,10 +39,8 @@ public:
    ~SoftwareSerial();
 
    void begin(long speed);
-   long baudRate();
    void setTransmitEnablePin(int transmitEnablePin);
 
-   bool overflow();
    int peek();
 
    virtual size_t write(uint8_t byte);
@@ -56,25 +54,17 @@ public:
 
    void rxRead();
 
-   // AVR compatibility methods
-   bool listen() { enableRx(true); return true; }
-   void end() { stopListening(); }
-   bool isListening() { return m_rxEnabled; }
-   bool stopListening() { enableRx(false); return true; }
-
    using Print::write;
 
 private:
    bool isValidGPIOpin(int pin);
 
    // Member variables
-    byte serInString[4];
+   byte serInString[5];
    int  serInIndx  = 0;
    int m_rxPin, m_txPin, m_txEnablePin;
-   bool m_rxValid, m_rxEnabled;
-   bool m_txValid, m_txEnableValid;
+   bool m_rxValid, m_txValid, m_txEnableValid;
    bool m_invert;
-   bool m_overflow;
    unsigned long m_bitTime;
    unsigned int m_inPos, m_outPos;
    int m_buffSize;

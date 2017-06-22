@@ -152,7 +152,7 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
 
 void setup() {
   responsePayload.reserve(RESPONSE_BUFFER);
-
+noInterrupts();
   // Set console baud rate
   DEBUG_PORT.begin(115200);
   //SerialD;
@@ -172,7 +172,8 @@ void setup() {
   pinMode(PIN_GSM_PWR, OUTPUT);
   digitalWrite(PIN_GSM_PWR, LOW);
 
-
+pinMode(D0, OUTPUT);
+digitalWrite(D0, LOW);
   // BOOT GSM
   delay(50);
   D("PWR");
@@ -185,7 +186,7 @@ void setup() {
   delay(300);
   DLN(".INIT...");
 
-
+interrupts();
   modem.init();
 	yield();    
   modemConnect();

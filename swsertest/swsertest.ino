@@ -11,11 +11,11 @@ SoftwareSerial swSer(D1,D2);
 int FLAG=0;
 boolean stringComplete = false;
 boolean interrupt = false;
-int  serIn;             // var that will hold the bytes-in read from the serialBuffer
-byte serInString[4];  // array that will hold the different bytes  100=100characters;
+//int  serIn;             // var that will hold the bytes-in read from the serialBuffer
+//byte serInString[4];  // array that will hold the different bytes  100=100characters;
                         // -> you must state how long the array will be else it won't work.
-int  serInIndx  = 0;    // index of serInString[] in which to insert the next incoming byte
-int  serOutIndx = 0;    // index of the outgoing serInString[] array;
+//int  serInIndx  = 0;    // index of serInString[] in which to insert the next incoming byte
+//int  serOutIndx = 0;    // index of the outgoing serInString[] array;
 
 volatile int i=0;
 /*void read_MultipleBytes () {
@@ -59,15 +59,18 @@ void setup() {
   swSer.enableRx(true);
 pinMode(LED_BUILTIN, OUTPUT);
 digitalWrite(LED_BUILTIN, LOW);
+pinMode(D0, OUTPUT);
+digitalWrite(D0, LOW);
 //pinMode(D1, INPUT_PULLUP);
 //attachInterrupt(digitalPinToInterrupt(D1), handleInterrupt,RISING);
  interrupts();
 }
 
 void loop() {
- 
-     
-
+ digitalWrite(LED_BUILTIN, HIGH);
+     delay(500);
+digitalWrite(LED_BUILTIN, LOW);
+     delay(500);
 }
 
 
