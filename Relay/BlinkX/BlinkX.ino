@@ -35,12 +35,12 @@ void setup() {
   pinMode(RELAY, OUTPUT);
   
   delay(3000);                      // Wait for two seconds (to demonstrate the active low LED)
-//  Serial.print("Hello World!\n");
+  Serial.print("Hello World!\n");
 }
 
 // the loop function runs over and over again forever
 void loop() {
-if(digitalRead(BUTTON)==HIGH){
+/*if(digitalRead(BUTTON)==HIGH){
  // digitalWrite(LED_BUILTIN, HIGH);// Ledi yak
   digitalWrite(LED, LOW);
 
@@ -63,9 +63,15 @@ if(digitalRead(BUTTON)==HIGH){
      digitalWrite(LED, HIGH);
   //digitalWrite(LED_BUILTIN, LOW);// Ledi yak
 
-  }
-
-  
+  }*/
+digitalWrite(LED, HIGH);
+ digitalWrite(RELAY, HIGH);
+ Serial.print("turn on!\n");
+delay(2000);
+Serial.print("turn off!\n");
+  digitalWrite(LED, LOW);
+   digitalWrite(RELAY, LOW);
+delay(1000);
   
 
 
