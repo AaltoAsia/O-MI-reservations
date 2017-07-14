@@ -40,9 +40,9 @@
 #define DEBUG_ESP_PORT Serial1
 
 #define PIN_GSM_PWR  D3
-#define PIN_LOCK     D6
+#define PIN_LOCK     D1
 #define PIN_SONOFF_RX D5
-#define PIN_SONOFF_TX D0 // TODO: connect or not?
+#define PIN_SONOFF_TX D6 // TODO: connect or not?
 
 
 

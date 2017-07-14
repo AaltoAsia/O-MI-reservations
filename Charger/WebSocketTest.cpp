@@ -7,25 +7,31 @@
 #include "OMIProcessing.h"
 #include <ESP8266WiFi.h>
 #include <Hash.h>
+#include <stdlib.h>
+#include <string.h>
+#include "SoftwareSerial.h"
 
-#include <SoftwareSerial.h>
-//const byte interruptPin = 5;
-SoftwareSerial Son_off(D1,D2);
+extern "C" {
+#include "user_interface.h"
+}
 
 
-byte data[5]={START,RELAY_ON,0x0D,0x0D,STOP};
-int flag=1;
-  
+SoftwareSerial Son_off(PIN_SONOFF_RX,PIN_SONOFF_TX);
+
+
+//byte data[5]={START,RELAY_ON,0x0D,0x0D,STOP};
+//int flag=1;
+volatile unsigned int beat_index=0,sonoff_index=0;
     
 
-
+//using namespace std;
 
 
 
 void reconnect();
 bool modemConnect();
 void sonoff(void);
-
+void send_current_or_power(int value,char* whichdata);
 TinyGsm modem(SerialAT);
 TinyGsmClient client(modem);
 DB database;
@@ -56,6 +62,9 @@ public:
   }
 };
 const char* PoleSubscriptionRequest = "<omiEnvelope xmlns=\"http://www.opengroup.org/xsd/omi/1.0/\" version=\"1.0\" ttl=\"-1\"><read msgformat=\"odf\" interval=\"-1\" callback=\"0\"><msg><Objects xmlns=\"http://www.opengroup.org/xsd/odf/1.0/\"><Object><id>HWTEST</id><InfoItem name=\"LidStatus\"/></Object></Objects></msg></read></omiEnvelope>";
+
+
+
 /*const char* PoleSubscriptionRequest = 
   "<omiEnvelope xmlns=\"http://www.opengroup.org/xsd/omi/1.0/\" version=\"1.0\" ttl=\"-1\">"
    "<read msgformat=\"odf\" interval=\"-1\" callback=\"0\">"
@@ -97,16 +106,102 @@ uint64_t heartbeatTimestamp = 0;
 bool isConnected = false;
 bool isSubscribed = false;
 bool isXml = false;
-volatile int a;
-WStype_t state;
-
+int a=20,b=10;
+//WStype_t state;
+char adress;
 //son off variables
 boolean stringComplete = false;
 int  serIn;             // var that will hold the bytes-in read from the serialBuffer
+char *p;
+//send power or current to server function.
+void send_current_or_power(int value,char* whichdata){
+String  str;
+String const currentdata2="</value></InfoItem></Object></Objects></msg></write></omiEnvelope>,";
+String  currentdata;
+char currentdata1[]="15";
+itoa(value, currentdata1, 10);
+	
+if(whichdata=="CURRENT"){
+
+currentdata="<omiEnvelope xmlns=\"http://www.opengroup.org/xsd/omi/1.0/\" version=\"1.0\" ttl=\"-1\"><write msgformat=\"odf\"><msg><Objects xmlns=\"http://www.opengroup.org/xsd/odf/1.0/\"><Object><id>HWTEST</id><InfoItem name=\"Current\"> <value>";
+
+
+}
+else if(whichdata=="VOLTAGE"){
+
+currentdata="<omiEnvelope xmlns=\"http://www.opengroup.org/xsd/omi/1.0/\" version=\"1.0\" ttl=\"-1\"><write msgformat=\"odf\"><msg><Objects xmlns=\"http://www.opengroup.org/xsd/odf/1.0/\"><Object><id>HWTEST</id><InfoItem name=\"Voltage\"> <value>";
+
+
+}
+
+
+
+    
+str =currentdata+currentdata1+currentdata2;
+
+
+	p = strtok(&str[0], ",");
+
+webSocket.sendTXT(p);
+//yield();
+}
 
 
 StringBuffer responsePayload;
 
+
+os_timer_t myTimer;
+
+bool tickOccured=true;
+
+// start of timerCallback
+void timerCallback(void *pArg) {
+	ESP.wdtDisable();
+
+if(isConnected&&isSubscribed){
+	beat_index++;
+	sonoff_index++;
+/*	if(beat_index==28){
+    digitalWrite(D0,!digitalRead(D0)); 
+	DLN("Sending heartbeat");
+    webSocket.sendTXT("");
+    beat_index=0;
+	}*/
+	DLN("Sending power_data");
+			a=Son_off.get_data(1);
+			b=Son_off.get_data(0);
+			
+		
+if(tickOccured==true){
+send_current_or_power(a,"CURRENT");	
+	tickOccured=false;
+
+}
+else{
+	send_current_or_power(b,"VOLTAGE");
+	tickOccured=true;
+
+}
+
+
+
+	
+}
+       
+ ESP.wdtEnable(WDTO_8S);   
+      
+      
+
+} // End of timerCallback
+
+void user_init(void) {
+
+
+      os_timer_setfn(&myTimer, timerCallback, NULL);
+
+
+      os_timer_arm(&myTimer, 5000, true);
+} // End of user_init
 
 void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
 
@@ -115,7 +210,7 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
         case WStype_DISCONNECTED:
             DFORMAT("[WSc] Disconnected!\n\r");
             isConnected = false;
-          //  state=type;
+           
            reconnect();
        
             break;
@@ -126,7 +221,8 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
             
                 DLN("Sending Subscription");
                 isSubscribed = false;
-                a=1;
+               user_init();
+			    
             }
             break;
         case WStype_TEXT:
@@ -151,8 +247,12 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
 
 
 void setup() {
+
   responsePayload.reserve(RESPONSE_BUFFER);
 noInterrupts();
+
+WiFi.mode(WIFI_OFF);//wifi off for saving power
+
   // Set console baud rate
   DEBUG_PORT.begin(115200);
   //SerialD;
@@ -161,14 +261,14 @@ noInterrupts();
   // Set GSM module baud rate
   SerialAT.begin(115200);
   SerialAT.swap();
-  delay(5000);
+  delay(3000);
 //sonooff serial 
   Son_off.begin(115200);
   Son_off.enableRx(true);
    delay(10);
   // PINS
- // pinMode(PIN_LOCK, OUTPUT);
-  //digitalWrite(PIN_LOCK, LOW);
+ pinMode(PIN_LOCK, OUTPUT);
+  digitalWrite(PIN_LOCK, LOW);
   pinMode(PIN_GSM_PWR, OUTPUT);
   digitalWrite(PIN_GSM_PWR, LOW);
 
@@ -190,6 +290,8 @@ interrupts();
   modem.init();
 	yield();    
   modemConnect();
+ 
+  
 }
 
 bool modemConnect() { // TODO: clean, move to websocket library?
@@ -234,19 +336,21 @@ bool modemConnect() { // TODO: clean, move to websocket library?
 void reconnect(void){
   DLN("Initializing modem...");
   modem.init();
-	yield();    
+   
   modemConnect();
+    yield();
 }
 
 
 void loop() {
 	
 	
-  DFORMAT("==state==: %d\r\n",a);
+  
   // if not connected try to connect
   if (!client.connected()) {
     //if (!reconnect()) return;
     reconnect();
+    
   }
 
 
@@ -257,16 +361,17 @@ void loop() {
     while (millis() < time && !isConnected) {
       webSocket.loop();
     }
+    yield();
   }
 
 
-
+ 
   while (isConnected) {
     webSocket.loop();
-DLN("===PART6=== ");
+//DLN("===PART6=== ");
+ yield();
 
-
-    if (isXml) {
+   if (isXml) {
     		 
       isXml = false;
       String value;
@@ -281,61 +386,25 @@ DLN("===PART6=== ");
         delay(2000);
         digitalWrite(PIN_LOCK, LOW);
       }
-      DLN("===PART7=== ");
+
     }
     
     //DFORMAT("RAM Memory left: %d\r\n", ESP.getFreeHeap());
 
-    if (! isSubscribed) {
-    	  DLN("===PART1=== ");
+ if (! isSubscribed) {
+    
       webSocket.sendTXT(PoleSubscriptionRequest);
       isSubscribed = true; // TODO: Check response success
-    }
-  // yazma();
-    uint64_t now = millis();
-DLN("===PART2=== ");
-    if((now - heartbeatTimestamp) > HEARTBEAT_INTERVAL) {
-	
-      heartbeatTimestamp = now;
-DLN("===PART3=== ");
-      DLN("Sending heartbeat");
-      webSocket.sendTXT("");
       
     }
+ 
 
 
-DLN("===PART4=== ");
   }
-  DLN("===PART5=== ");
+  yield();
 }
 
 
-/*void sonoff(void){
-   read_MultipleBytes ();
-  
-
-
-  if (stringComplete) {
-    
-    swSer.print("WELCOME!\n");
-    if (serInString[1] == 0x0F) {
-        digitalWrite(LED_BUILTIN, LOW);   // Turn the LED ON 
-        
-        swSer.print("LED ON!\n");
-     
-    }
-    else if (serInString[1] == 0x03) {
-        digitalWrite(LED_BUILTIN, LOW);  // Turn the LED on by making the voltage HIGH
-      
-
-    }
-    stringComplete=false;
-  }
-                                    
-  delay(50);                      // Wait for a second	
-	
-}
-*/
 
 
 
