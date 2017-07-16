@@ -219,26 +219,26 @@ void ICACHE_RAM_ATTR SoftwareSerial::rxRead(void) {
    }
     sb=read();
    serInString[serInIndx] = sb;
-  // test=serInString[0];
+  
           serInIndx++;
    
   if(serInIndx==DATA_SIZE){
-  
-//digitalWrite(D8, LOW);
-  	if(serInString[0]==0xAA && serInString[6]==0xAA){
+  	write(serInString[0]);
+  	write(serInString[1]);
+
+  /*	if(serInString[0]==0xAA && serInString[6]==0xAA){
   	
 	  //	Serial.write("welcome!!\n");
 	  	 digitalWrite(D0, !digitalRead(D0));
 	
 	  }
   
-  	write(serInString[0]);
-  	write(serInString[1]);
-  //	write(serInString[2]);
+  
+    //write(serInString[2]);
   //	write(serInString[3]);
- // 	write(serInString[4]);
- // 	write(serInString[5]);
- // 	write(serInString[6]);
+  	//write(serInString[4]);
+  //	write(serInString[5]);
+  	write(serInString[6]);*/
  	serInIndx=0;
   }
   // 

@@ -26,7 +26,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <inttypes.h>
 #include <Stream.h>
 
-#define DATA_SIZE 2
+#define DATA_SIZE 7
 // This class is compatible with the corresponding AVR one,
 // the constructor however has an optional rx buffer size.
 // Speed up to 115200 can be used.
@@ -57,9 +57,10 @@ public:
    using Print::write;
  
  //void setAge(int _age[]);
- 
+ bool data_flag=false;
 byte get_data(int i){
- 	if(i<DATA_SIZE){
+	
+ 	if(i<DATA_SIZE&&serInString[0]==0xAA && serInString[6]==0xAA){
  			return	serInString[i];//success
 	 }
  else{

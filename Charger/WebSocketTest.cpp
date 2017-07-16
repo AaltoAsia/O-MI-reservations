@@ -127,7 +127,7 @@ currentdata="<omiEnvelope xmlns=\"http://www.opengroup.org/xsd/omi/1.0/\" versio
 
 
 }
-else if(whichdata=="VOLTAGE"){
+else if(whichdata=="POWER"){
 
 currentdata="<omiEnvelope xmlns=\"http://www.opengroup.org/xsd/omi/1.0/\" version=\"1.0\" ttl=\"-1\"><write msgformat=\"odf\"><msg><Objects xmlns=\"http://www.opengroup.org/xsd/odf/1.0/\"><Object><id>HWTEST</id><InfoItem name=\"Voltage\"> <value>";
 
@@ -158,6 +158,8 @@ bool tickOccured=true;
 void timerCallback(void *pArg) {
 	ESP.wdtDisable();
 
+unsigned int volatile data=0,data1=0;
+
 if(isConnected&&isSubscribed){
 	beat_index++;
 	sonoff_index++;
@@ -167,21 +169,27 @@ if(isConnected&&isSubscribed){
     webSocket.sendTXT("");
     beat_index=0;
 	}*/
-	DLN("Sending power_data");
-			a=Son_off.get_data(1);
-			b=Son_off.get_data(0);
-			
+
+	
 		
-if(tickOccured==true){
-send_current_or_power(a,"CURRENT");	
+			
+		if(tickOccured==true){
+	data=Son_off.get_data(3)*256+Son_off.get_data(4);
+	DLN("Sending current_data");
+send_current_or_power(data,"CURRENT");	
 	tickOccured=false;
 
 }
 else{
-	send_current_or_power(b,"VOLTAGE");
+data=Son_off.get_data(1)*256+Son_off.get_data(2);
+		DLN("Sending power_data");
+	send_current_or_power(data,"POWER");
 	tickOccured=true;
 
-}
+}	
+			
+		
+
 
 
 
