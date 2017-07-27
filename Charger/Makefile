@@ -2,6 +2,10 @@ SKETCH = WebSocketTest.cpp
 
 #ESP_ROOT ?= $(HOME)/Arduino/esp8266/
 
+LIBS += $(ESP_LIBS)/ArduinoOTA \
+	$(ESP_LIBS)/ESP8266WiFi \
+$(ESP_LIBS)/ESP8266mDNS \
+$(ESP_LIBS)/Hash \.
 #LIBS += $(ESP_LIBS)/ESP8266WiFi \
 #	$(ESP_LIBS)/ESP8266HTTPClient \
 #	espsoftwareserial \
@@ -15,7 +19,9 @@ UPLOAD_PORT = COM8
 UPLOAD_SPEED  = 921600
 MONITOR_SPEED = 115200
 BOARD = d1_mini
-
+ESP_ADDR ?= 192.168.1.9
+ESP_PORT ?= 8266
+ESP_PWD ?= 123
 #FLASH_DEF = 4M3M
 FLASH_DEF = 4M1M
 

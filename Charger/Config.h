@@ -36,7 +36,7 @@
 // PIN CONFIGURATION
 	
 // GSM module
-#define SerialAT Serial
+#define SerialAT Serial//RX-->D7,TX-->D8
 #define DEBUG_ESP_PORT Serial1
 
 #define PIN_GSM_PWR  D3

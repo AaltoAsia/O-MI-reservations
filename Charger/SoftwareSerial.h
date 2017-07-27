@@ -26,7 +26,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <inttypes.h>
 #include <Stream.h>
 
-#define DATA_SIZE 7
+#define DATA_SIZE 7//How many data do you want to get from serial?
+
 // This class is compatible with the corresponding AVR one,
 // the constructor however has an optional rx buffer size.
 // Speed up to 115200 can be used.
@@ -56,8 +57,19 @@ public:
    
    using Print::write;
  
- //void setAge(int _age[]);
- bool data_flag=false;
+/*****************GET DATA FUNCTION********************
+*
+*  
+*
+*get_data[0]--->Start byte
+*get_data[1]--->POWER_HIGH BYTE
+*get_data[2]--->POWER_LOW BYTE
+*get_data[3]--->CURRENT_HIGH BYTE
+*get_data[4]--->CURRENT_LOW BYTE
+*get_data[5]--->RELAY_STATUS
+*get_data[6]--->Stop byte
+*
+********************************************************/
 byte get_data(int i){
 	
  	if(i<DATA_SIZE&&serInString[0]==0xAA && serInString[6]==0xAA){
@@ -75,7 +87,7 @@ private:
    bool isValidGPIOpin(int pin);
  
    // Member variables
- byte serInString[DATA_SIZE];
+   byte serInString[DATA_SIZE];
    int  serInIndx  = 0;
    int m_rxPin, m_txPin, m_txEnablePin;
    bool m_rxValid, m_txValid, m_txEnableValid;
