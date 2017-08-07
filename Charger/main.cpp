@@ -405,7 +405,10 @@ if(ota_flag!=true){
         if (findValue(item, value, tmpb)) {
         
           DFORMAT("Result: %s", value.c_str());
-           
+          digitalWrite(PIN_LOCK, HIGH);
+          delay(2000);
+          digitalWrite(PIN_LOCK, LOW);
+          
 		   if(value=="update"){//do we get update request from server?
 		   		os_timer_disarm(&myTimer);
 		   	ota_flag=true;
@@ -414,6 +417,12 @@ if(ota_flag!=true){
         digitalWrite(PIN_LOCK, LOW);
         	
 		}
+	/*	else if(value=="open"){
+		digitalWrite(PIN_LOCK, HIGH);
+        delay(2000);
+        digitalWrite(PIN_LOCK, LOW);
+			
+		}*/
         }
        
         

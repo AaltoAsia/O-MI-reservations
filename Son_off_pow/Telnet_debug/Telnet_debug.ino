@@ -1,3 +1,5 @@
+#define TELNET_DEBUG
+//#define SERIAL_COM
 
 extern "C" {
 #include "user_interface.h"
@@ -15,8 +17,8 @@ RemoteDebug Debug;
 float a=0;
 // SSID and password
 
-const char* ssid = "NETGEAR91";
-const char* password = "melodictree981";
+const char* ssid = "aalto open";
+const char* password = "";
 
 // Host mDNS
 
@@ -61,22 +63,23 @@ index_senddata++;
     
   }
  if(index_senddata==8){
-  Debug.println("=============POWER==============");
-    //  WriteMyUART_Bytes(power);
-      //Debug.printf("\n");
-     Debug.printf("POWER: %u\n",power);
-     Debug.println("=====================================");
+      #ifdef TELNET_DEBUG
+      Debug.println("=============POWER==============");
+      Debug.printf("POWER: %u\n",power);
+      Debug.println("=====================================");
+      
       Debug.println("============CURRENT==================");
-      //WriteMyUART_Bytes(current);
-     //  Debug.printf("\n");
       Debug.printf("CURRENT: %u\n",current);
       Debug.println("=====================================");
-       Serial.write(0xAA);
+      #endif
+      
+     #ifdef SERIAL_COM
+     Serial.write(0xAA);
      WriteMyUART_Bytes(power);
      WriteMyUART_Bytes(current);
      Serial.write(relay_status);
      Serial.write(0xAA);
-     
+     #endif
       index_senddata=0;
     
   }
@@ -110,15 +113,46 @@ union U16_ Int2Bytes;
 
    Int2Bytes.word = MyInWord;
 
-           // Debug.print(0xDC);
+           
             Debug.print(Int2Bytes.byte[1]);       //high byte
-           //  Debug.printf("\n");
             Debug.print(Int2Bytes.byte[0]);        //low byte
-            // Debug.printf("\n");
+            
 
 }     
 ////************************SENDING TWO BYTES CONVERSION BLOCK************************////
 
+
+//SONOFF CONFIG 
+void power_init(void){
+    power_dev.setPowerParam(12.98801022,0.0);
+    power_dev.setCurrentParam(19.52,-85.9);
+    power_dev.setVoltageParam(0.45039823,0.0);
+    power_dev.enableMeasurePower();
+    power_dev.selectMeasureCurrentOrVoltage(CURRENT);
+    power_dev.startMeasure();
+}
+
+//REMOTE DEBUG CONFIG
+void debug_init(){
+    WiFi.begin(ssid, password);
+    // Wait for connection
+    while (WiFi.status() != WL_CONNECTED) {
+      delay(500);
+     // Serial.print(".");
+    }
+    // Register host name in WiFi and mDNS
+
+    String hostNameWifi = HOST_NAME;
+    hostNameWifi.concat(".local");
+    WiFi.hostname(hostNameWifi);
+
+    MDNS.addService("telnet", "tcp", 23);
+    Debug.begin(HOST_NAME); // Initiaze the telnet server
+
+    Debug.setResetCmdEnabled(true); // Enable the reset command
+
+  }
+  
 void setup() {
 
     // Initialize the Serial (educattional use only, not need in production)
@@ -129,70 +163,16 @@ void setup() {
 
    pinMode(LED, OUTPUT);
    digitalWrite(LED, LOW);
- pinMode(RELAY, OUTPUT);
+   pinMode(RELAY, OUTPUT);
    digitalWrite(RELAY, HIGH);
     // WiFi connection
- relay_status=1;
-    WiFi.begin(ssid, password);
-  //  Serial.println("");
+   relay_status=1;
 
-    // Wait for connection
-    while (WiFi.status() != WL_CONNECTED) {
-      delay(500);
-     // Serial.print(".");
-    }
-
- /*   Serial.println("");
-    Serial.print("Connected to ");
-    Serial.println(ssid);
-    Serial.print("IP address: ");
-    Serial.println(WiFi.localIP());*/
-
-    // Register host name in WiFi and mDNS
-
-    String hostNameWifi = HOST_NAME;
-    hostNameWifi.concat(".local");
-
-    WiFi.hostname(hostNameWifi);
-
-    if (MDNS.begin(HOST_NAME)) {
-      //  Serial.print("* MDNS responder started. Hostname -> ");
-       // Serial.println(HOST_NAME);
-    }
-
-    MDNS.addService("telnet", "tcp", 23);
-
-    // Initialize the telnet server of RemoteDebug
-
-    Debug.begin(HOST_NAME); // Initiaze the telnet server
-
-    Debug.setResetCmdEnabled(true); // Enable the reset command
-
-    //Debug.showTime(true); // To show time
-
-    // Debug.showProfiler(true); // To show profiler - time between messages of Debug
-                              // Good to "begin ...." and "end ...." messages
-
-    // This sample (serial -> educattional use only, not need in production)
-
-   //Serial.println("* Arduino RemoteDebug Library");
-   // Serial.println("*");
-   // Serial.print("* WiFI connected. IP address: ");
-   // Serial.println(WiFi.localIP());
-   // Serial.println("*");
-   // Serial.println("* Please use the telnet client (telnet for Mac/Unix or putty and others for Windows)");
-   // Serial.println("*");
-   // Serial.println("* This sample will send messages of debug in all levels.");
-   // Serial.println("*");
-   // Serial.println("* Please try change debug level in telnet, to see how it works");
-   // Serial.println("*");
-     power_dev.setPowerParam(12.65801022,0.0);
-    power_dev.setCurrentParam(19.52,-85.9);
-    power_dev.setVoltageParam(0.45039823,0.0);
-    power_dev.enableMeasurePower();
-    power_dev.selectMeasureCurrentOrVoltage(CURRENT);
-    power_dev.startMeasure();
-   timer_init();//timer config for every sec
+ #ifdef TELNET_DEBUG
+ debug_init();
+ #endif 
+ power_init();
+ timer_init();//timer config for every sec
 }
 
 void loop()
@@ -201,7 +181,7 @@ void loop()
  
     
         // Time
-
+   #ifdef TELNET_DEBUG
         mLastTime = millis();
 
         mTimeSeconds++;
@@ -226,7 +206,7 @@ void loop()
     // Give a time for ESP8266
 
     yield();
-
+   #endif
 
 }
 

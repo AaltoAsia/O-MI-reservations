@@ -1,4 +1,4 @@
-SKETCH = WebSocketTest.cpp
+SKETCH = main.cpp
 
 #ESP_ROOT ?= $(HOME)/Arduino/esp8266/
 
@@ -13,9 +13,9 @@ $(ESP_LIBS)/Hash \.
 #	arduinoWebsockets \
 #	.
 
-	#$(ESP_LIBS)/ESP8266httpUpdate \
+	
 
-UPLOAD_PORT = COM8
+UPLOAD_PORT = COM3
 UPLOAD_SPEED  = 921600
 MONITOR_SPEED = 115200
 BOARD = d1_mini
