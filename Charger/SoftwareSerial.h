@@ -27,11 +27,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <Stream.h>
 
 #define DATA_SIZE 7//How many data do you want to get from serial?
-
+#define START_BYTE 0XAA
+#define STOP_BYTE  0XAA
 // This class is compatible with the corresponding AVR one,
 // the constructor however has an optional rx buffer size.
 // Speed up to 115200 can be used.
-void asd(void);
 
 class SoftwareSerial : public Stream
 {
@@ -57,6 +57,15 @@ public:
    
    using Print::write;
  
+ bool data_control(void){
+ 	
+ 	if(serInString[0]==START_BYTE && serInString[6]==STOP_BYTE){
+ 		return true;
+	 }
+	 else{
+	 	return false;
+	 }
+ }
 /*****************GET DATA FUNCTION********************
 *
 *  
@@ -72,12 +81,10 @@ public:
 ********************************************************/
 byte get_data(int i){
 	
- 	if(i<DATA_SIZE&&serInString[0]==0xAA && serInString[6]==0xAA){
+ 	if(i<DATA_SIZE&&data_control()){
  			return	serInString[i];//success
 	 }
- else{
- 	return 0;//fail
- }
+ 
 	 
  	
  }
@@ -87,7 +94,7 @@ private:
    bool isValidGPIOpin(int pin);
  
    // Member variables
-   byte serInString[DATA_SIZE];
+    byte serInString[DATA_SIZE];
    int  serInIndx  = 0;
    int m_rxPin, m_txPin, m_txEnablePin;
    bool m_rxValid, m_txValid, m_txEnableValid;

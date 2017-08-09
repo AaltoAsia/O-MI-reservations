@@ -1,5 +1,5 @@
-#define TELNET_DEBUG
-//#define SERIAL_COM
+//#define TELNET_DEBUG
+#define SERIAL_COM
 
 extern "C" {
 #include "user_interface.h"
@@ -114,8 +114,8 @@ union U16_ Int2Bytes;
    Int2Bytes.word = MyInWord;
 
            
-            Debug.print(Int2Bytes.byte[1]);       //high byte
-            Debug.print(Int2Bytes.byte[0]);        //low byte
+            Serial.write(Int2Bytes.byte[1]);       //high byte
+            Serial.write(Int2Bytes.byte[0]);        //low byte
             
 
 }     
@@ -124,7 +124,7 @@ union U16_ Int2Bytes;
 
 //SONOFF CONFIG 
 void power_init(void){
-    power_dev.setPowerParam(12.98801022,0.0);
+   power_dev.setPowerParam(12.98801022,0.0);
     power_dev.setCurrentParam(19.52,-85.9);
     power_dev.setVoltageParam(0.45039823,0.0);
     power_dev.enableMeasurePower();

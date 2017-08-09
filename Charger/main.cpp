@@ -108,13 +108,14 @@ bool isXml = false;
 //send power or current to server function.
 bool send_flag=false;
 void send_current_or_power(int value,char* whichdata){
+	
 String  str;
 char *p;
 String const currentdata2="</value></InfoItem></Object></Objects></msg></write></omiEnvelope>,";//you must add "," end of currentdata2 xml text to seperate xml text.
 String  currentdata;
 char currentdata1[]="15";
 itoa(value, currentdata1, 10);
-	
+
 if(whichdata=="CURRENT"){
 
 currentdata="<omiEnvelope xmlns=\"http://www.opengroup.org/xsd/omi/1.0/\" version=\"1.0\" ttl=\"-1\"><write msgformat=\"odf\"><msg><Objects xmlns=\"http://www.opengroup.org/xsd/odf/1.0/\"><Object><id>HWTEST</id><InfoItem name=\"Current\"> <value>";
@@ -123,7 +124,7 @@ currentdata="<omiEnvelope xmlns=\"http://www.opengroup.org/xsd/omi/1.0/\" versio
 }
 else if(whichdata=="POWER"){
 
-currentdata="<omiEnvelope xmlns=\"http://www.opengroup.org/xsd/omi/1.0/\" version=\"1.0\" ttl=\"-1\"><write msgformat=\"odf\"><msg><Objects xmlns=\"http://www.opengroup.org/xsd/odf/1.0/\"><Object><id>HWTEST</id><InfoItem name=\"Voltage\"> <value>";
+currentdata="<omiEnvelope xmlns=\"http://www.opengroup.org/xsd/omi/1.0/\" version=\"1.0\" ttl=\"-1\"><write msgformat=\"odf\"><msg><Objects xmlns=\"http://www.opengroup.org/xsd/odf/1.0/\"><Object><id>HWTEST</id><InfoItem name=\"Power\"> <value>";
 
 
 }
@@ -133,7 +134,9 @@ str =currentdata+currentdata1+currentdata2;
 
 	p = strtok(&str[0], ",");
 send_flag=true;
+if(value<15000){
 webSocket.sendTXT(p);
+}	
 send_flag=false;
 }
 
@@ -145,12 +148,12 @@ StringBuffer responsePayload;
 os_timer_t myTimer;
 volatile unsigned int beat_index=0,sonoff_index=0;
 bool tickOccured=true;
-
+unsigned int data=0;
 // start of timerCallback
 void timerCallback(void *pArg) {
 	ESP.wdtDisable();
 
-unsigned int volatile data=0;
+
 
 if(isConnected&&isSubscribed){
 	beat_index++;
@@ -166,14 +169,14 @@ if(isConnected&&isSubscribed){
 		
 			
 		if(tickOccured==true){
-	data=Son_off.get_data(3)*256+Son_off.get_data(4);
+	data=(unsigned int)Son_off.get_data(3)*256+(unsigned int)Son_off.get_data(4);
 	DLN("Sending current_data");
     send_current_or_power(data,"CURRENT");	
 	tickOccured=false;
 
 }
 else{
-    data=Son_off.get_data(1)*256+Son_off.get_data(2);
+    data=(unsigned int)Son_off.get_data(1)*256+(unsigned int)Son_off.get_data(2);
 	DLN("Sending power_data");
 
 	send_current_or_power(data,"POWER");
@@ -189,11 +192,11 @@ else{
 
 
 bool ota_flag=false;
-void handleInterrupt() {
+/*void handleInterrupt() {
   digitalWrite(PIN_LOCK, !digitalRead(PIN_LOCK));     // Initialize the LED_BUILTIN pin as an output
    
 
-}
+}*/
 
 
 
@@ -250,9 +253,6 @@ if(ota_flag!=true){
 
 
 void setup() {
-  //OTA update config
-  ArduinoOTA.onError([](ota_error_t error) { ESP.restart(); });
-  ArduinoOTA.begin();  /* setup the OTA server */
  
  responsePayload.reserve(RESPONSE_BUFFER);
  noInterrupts();
@@ -280,6 +280,19 @@ void setup() {
 
 pinMode(D0, OUTPUT);
 digitalWrite(D0, LOW);
+
+ //OTA update config
+  ArduinoOTA.onError([](ota_error_t error) { ESP.restart(); });
+  ArduinoOTA.begin();  /* setup the OTA server */
+   ArduinoOTA.onStart([]() {
+     digitalWrite(PIN_LOCK, HIGH);
+  });
+  ArduinoOTA.onEnd([]() {
+    digitalWrite(PIN_LOCK, LOW);
+  });
+   ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
+     digitalWrite(PIN_LOCK, HIGH);
+  });
   // BOOT GSM
   delay(50);
   D("PWR");
@@ -298,8 +311,8 @@ interrupts();
   modemConnect();
  
   
-    pinMode(D2, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(D2), handleInterrupt, RISING);
+  //  pinMode(D2, INPUT_PULLUP);
+ // attachInterrupt(digitalPinToInterrupt(D2), handleInterrupt, RISING);
 }
 
 bool modemConnect() { // TODO: clean, move to websocket library?
@@ -376,15 +389,15 @@ void loop() {
 
  while(ota_flag==true&&send_flag==false){//is there OTA UPDATE? 
   DLN("======OTA UPDATE==== ");
- 	noInterrupts();
-    client.stop();
-    ESP.wdtDisable();
-    webSocket.disconnect();
+ //	noInterrupts();
+ //   client.stop();
+   // ESP.wdtDisable();
+   // webSocket.disconnect();
   
     ArduinoOTA.handle();// Add support for OTA***************************************
   
     yield();
-    ESP.wdtEnable(WDTO_8S); 
+    //ESP.wdtEnable(WDTO_8S); 
     } 
     
 if(ota_flag!=true){
@@ -405,24 +418,26 @@ if(ota_flag!=true){
         if (findValue(item, value, tmpb)) {
         
           DFORMAT("Result: %s", value.c_str());
-          digitalWrite(PIN_LOCK, HIGH);
-          delay(2000);
-          digitalWrite(PIN_LOCK, LOW);
-          
+         
+		 // digitalWrite(PIN_LOCK, HIGH);
+         // delay(2000);
+          //digitalWrite(PIN_LOCK, LOW);
+           digitalWrite(PIN_LOCK, !digitalRead(PIN_LOCK));
 		   if(value=="update"){//do we get update request from server?
 		   		os_timer_disarm(&myTimer);
 		   	ota_flag=true;
-        	digitalWrite(PIN_LOCK, HIGH);
-        delay(2000);
-        digitalWrite(PIN_LOCK, LOW);
+		   	 digitalWrite(PIN_LOCK, !digitalRead(PIN_LOCK));
+        //	digitalWrite(PIN_LOCK, HIGH);
+        //delay(2000);
+        //digitalWrite(PIN_LOCK, LOW);
         	
 		}
-	/*	else if(value=="open"){
+		else if(value=="open"){
 		digitalWrite(PIN_LOCK, HIGH);
         delay(2000);
         digitalWrite(PIN_LOCK, LOW);
 			
-		}*/
+		}
         }
        
         

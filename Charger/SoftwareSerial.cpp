@@ -182,17 +182,7 @@ int SoftwareSerial::peek() {
    return m_buffer[m_outPos];
 }
 
-/*int *get_data(int size[7],bool i ){
-	int get_from_rx[7];
-	if(i==true){
-		
-		get_from_rx=size;
-	}
-	else{
-			return get_from_rx;
-	}
 
-}*/
 
 void ICACHE_RAM_ATTR SoftwareSerial::rxRead(void) {
    // Advance the starting point for the samples but compensate for the
@@ -226,7 +216,7 @@ void ICACHE_RAM_ATTR SoftwareSerial::rxRead(void) {
   	write(serInString[0]);
   	write(serInString[1]);
 
-  /*	if(serInString[0]==0xAA && serInString[6]==0xAA){
+  	if(serInString[0]==START_BYTE && serInString[6]==STOP_BYTE){
   	
 	  //	Serial.write("welcome!!\n");
 	  	 digitalWrite(D0, !digitalRead(D0));
@@ -238,9 +228,12 @@ void ICACHE_RAM_ATTR SoftwareSerial::rxRead(void) {
   //	write(serInString[3]);
   	//write(serInString[4]);
   //	write(serInString[5]);
-  	write(serInString[6]);*/
+  //	write(serInString[6]);*/
+ // memset(serInString, 0, DATA_SIZE * (sizeof serInString[0]) );
  	serInIndx=0;
+ 	
   }
+  flush();
   // 
    //Serial.println("welcome!");
    // Must clear this bit in the interrupt register,
