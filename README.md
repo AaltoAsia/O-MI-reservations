@@ -41,6 +41,21 @@ with agent for handling the reservations. This link has it preinstalled.
   might require newer version from branch `master` of this repository.
 
 
+Connections
+-----------
+1.5V WEMOS D1 MINI <-->EXTERNAL 5V SUPPLY<-->AI THINKER GSM/GPRS VCC
+
+2.GND WEMOS D1 MINI <--> GND<-->AI THINKER GSM/GPRS GND<-->SONOFF POW GND PIN(!!!!They must be connected same gnd ,otherwise serial communication does not work properly.)
+
+3.WEMOS D1 MINI (D3)  <--> AI THINKER GSM/GPRS PWR
+4.WEMOS D1 MINI (D8)  <--> AI THINKER GSM/GPRS RX
+5.WEMOS D1 MINI (D7)  <--> AI THINKER GSM/GPRS TX
+6.WEMOS D1 MINI (D1)<--> LOCK TRIGGER PIN
+7.WEMOS D1 MINI (D5)<-->SONOFF POW TX PIN
+8.WEMOS D1 MINI (D6)<-->SONOFF POW RX PIN
+9.WEMOS D1 MINI (RX)<-->BETWEEN SONOFF POW AND WEMOS COMMUNICATION CHECK INDICATOR LED(IT FLASHES EVERY 8 SEC)
+10.WEMOS D1 MINI (D0)<-->UPLOAD INDICATOR LED
+11.WEMOS D1 MINI (D2)<-->CONNECTION INDICATOR LED
 
 Reprogramming Sonoff
 -------------------
