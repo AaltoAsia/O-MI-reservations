@@ -219,7 +219,7 @@ void ICACHE_RAM_ATTR SoftwareSerial::rxRead(void) {
   	if(serInString[0]==START_BYTE && serInString[6]==STOP_BYTE){
   	
 	  //	Serial.write("welcome!!\n");
-	  	 digitalWrite(D0, !digitalRead(D0));
+	  	 digitalWrite(RX, !digitalRead(RX));
 	
 	  }
   

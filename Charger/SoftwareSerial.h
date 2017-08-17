@@ -81,9 +81,21 @@ public:
 ********************************************************/
 byte get_data(int i){
 	
- 	if(i<DATA_SIZE&&data_control()){
- 			return	serInString[i];//success
+	
+		
+		
+			if(i<DATA_SIZE&&data_control()){
+				if(serInString[5]){
+					return	serInString[i];//success
+				}
+				else{
+					return 0;
+				}
+ 		
 	 }
+ 
+		
+
  
 	 
  	

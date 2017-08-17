@@ -158,12 +158,13 @@ void timerCallback(void *pArg) {
 if(isConnected&&isSubscribed){
 	beat_index++;
 	sonoff_index++;
-/*	if(beat_index==28){
-    digitalWrite(D0,!digitalRead(D0)); 
+	if(beat_index==6){
+ //   digitalWrite(D0,!digitalRead(D0)); 
 	DLN("Sending heartbeat");
     webSocket.sendTXT("");
     beat_index=0;
-	}*/
+	}
+else{
 
 	
 		
@@ -183,7 +184,7 @@ else{
 	tickOccured=true;
 
 }	
-	
+}
 }
        
  ESP.wdtEnable(WDTO_8S);   
@@ -218,7 +219,7 @@ if(ota_flag!=true){
             isConnected = false;
            
            reconnect();
-       
+          digitalWrite(PIN_RUNNING, LOW);
             break;
         case WStype_CONNECTED:
             {
@@ -228,7 +229,7 @@ if(ota_flag!=true){
                 DLN("Sending Subscription");
                 isSubscribed = false;
                 user_init();//timer config for sending power/current data
-			    
+			   
             }
             break;
         case WStype_TEXT:
@@ -269,7 +270,7 @@ void setup() {
   SerialAT.swap();
   delay(3000);
 //sonooff serial 
-  Son_off.begin(115200);
+  Son_off.begin(9600);
   Son_off.enableRx(true);
    delay(10);
   // PINS
@@ -278,21 +279,30 @@ void setup() {
   pinMode(PIN_GSM_PWR, OUTPUT);
   digitalWrite(PIN_GSM_PWR, LOW);
 
-pinMode(D0, OUTPUT);
-digitalWrite(D0, LOW);
+//Indicator and debug pins init
+pinMode(PIN_RUNNING, OUTPUT);
+digitalWrite(PIN_RUNNING, LOW);
+pinMode(PIN_UPLOAD, OUTPUT);
+digitalWrite(PIN_UPLOAD, LOW);
+pinMode(PIN_SONOFF_COM, OUTPUT);
+digitalWrite(PIN_SONOFF_COM, LOW);
 
  //OTA update config
   ArduinoOTA.onError([](ota_error_t error) { ESP.restart(); });
   ArduinoOTA.begin();  /* setup the OTA server */
-   ArduinoOTA.onStart([]() {
-     digitalWrite(PIN_LOCK, HIGH);
+  
+  ArduinoOTA.onStart([]() {
+  digitalWrite(PIN_UPLOAD, HIGH);
   });
+  
   ArduinoOTA.onEnd([]() {
-    digitalWrite(PIN_LOCK, LOW);
+    digitalWrite(PIN_UPLOAD, LOW);
   });
+  
    ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-     digitalWrite(PIN_LOCK, HIGH);
+     digitalWrite(PIN_UPLOAD, HIGH);
   });
+ 
   // BOOT GSM
   delay(50);
   D("PWR");
@@ -357,7 +367,7 @@ bool modemConnect() { // TODO: clean, move to websocket library?
 void reconnect(void){
   DLN("Initializing modem...");
   modem.init();
-   
+   digitalWrite(PIN_RUNNING, LOW); 
   modemConnect();
     yield();
 }
@@ -419,25 +429,29 @@ if(ota_flag!=true){
         
           DFORMAT("Result: %s", value.c_str());
          
-		 // digitalWrite(PIN_LOCK, HIGH);
-         // delay(2000);
-          //digitalWrite(PIN_LOCK, LOW);
-           digitalWrite(PIN_LOCK, !digitalRead(PIN_LOCK));
+		
+          // digitalWrite(PIN_LOCK, !digitalRead(PIN_LOCK));
 		   if(value=="update"){//do we get update request from server?
 		   		os_timer_disarm(&myTimer);
 		   	ota_flag=true;
-		   	 digitalWrite(PIN_LOCK, !digitalRead(PIN_LOCK));
+		   	char ip=WiFi.localIP();
+		   	send_current_or_power(WiFi.localIP(),"POWER");
+		   	// digitalWrite(PIN_LOCK, !digitalRead(PIN_LOCK));
         //	digitalWrite(PIN_LOCK, HIGH);
         //delay(2000);
         //digitalWrite(PIN_LOCK, LOW);
         	
+		}else{
+		  digitalWrite(PIN_LOCK, HIGH);
+          delay(2000);
+          digitalWrite(PIN_LOCK, LOW);	
 		}
-		else if(value=="open"){
+		/*else if(value=="open"){
 		digitalWrite(PIN_LOCK, HIGH);
         delay(2000);
         digitalWrite(PIN_LOCK, LOW);
 			
-		}
+		}*/
         }
        
         
@@ -451,7 +465,7 @@ if(ota_flag!=true){
     
       webSocket.sendTXT(PoleSubscriptionRequest);
       isSubscribed = true; // TODO: Check response success
-      
+       digitalWrite(PIN_RUNNING, HIGH);
     }
 }
 

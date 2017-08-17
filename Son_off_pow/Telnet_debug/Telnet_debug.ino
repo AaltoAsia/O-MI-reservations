@@ -51,9 +51,12 @@ index_senddata++;
      power=(int)power_dev.getPower();
      if((int)power_dev.getPower()!=0){
        current=(int)power_dev.getCurrent();
-       if(current>13000){
-        
+       if(power<20){
+   relay_status=0;
         }
+        else{
+          relay_status=1;
+          }
       }
     
      // power=5000;
@@ -157,7 +160,7 @@ void setup() {
 
     // Initialize the Serial (educattional use only, not need in production)
 
-    Serial.begin(115200);
+    Serial.begin(9600);
 
     // Buildin led off ESP8266
 

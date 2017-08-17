@@ -43,7 +43,9 @@
 #define PIN_LOCK     D1
 #define PIN_SONOFF_RX D5
 #define PIN_SONOFF_TX D6 // TODO: connect or not?
-
+#define PIN_RUNNING  D2//check device 
+#define PIN_UPLOAD   D0//upload request?
+#define PIN_SONOFF_COM RX//Does sonoff communication work properly?
 
 
 
