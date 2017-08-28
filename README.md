@@ -73,7 +73,7 @@ other than serial pins available easily. So for future expansion possibilities I
 chose to use another esp8266 for the real program. Anyways sonoff need to be
 reprogrammed, which is quite easy.
 
-1. Open `Son_off_pow/Telnet_debug/Telnet_debug.ino` in Arduino IDE
+1. Open `Son_off_pow/Telnet_debug/Telnet_debug.ino` in Arduino IDE 
 2. Change board to `Generic ESP8266 Module`
 2. Open Sonoff module package to reveal the circuit board
 3. Solder a pin header to Sonoff holes marked as VCC, TX, RX, GND
@@ -89,11 +89,11 @@ corresponding state.
 
 Debug Features
 --------------
-You should modify "Telnet_debug.ino" to use debug features.
+You should modify `Telnet_debug.ino` to use debug features.
 
-1.if you define "TELNET_DEBUG" ,you can monitor power,current,voltage,frequency as wireless.
+1.if you define `TELNET_DEBUG` ,you can monitor power,current,voltage,frequency as wireless.
 
-2.To send with serial port,define "SERIAL_COM" in software.
+2.To send with serial port,define `SERIAL_COM` in software.
 
 Telnet Configuration 
 --------------------
@@ -101,7 +101,7 @@ Programming ESP8266 Module
 -------------------------
 
 1. Connect USB cable to ESP8266 and computer.
-2. Open Arduino IDE to open `EspRelay/EspRelay.ino` or use Makefile with `make upload` 
+2. use Makefile with `make upload` 
 3. Change Settings for your Module (WeMos Mini for me)
 4. Upload
 
