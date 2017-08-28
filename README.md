@@ -7,11 +7,10 @@ ESP8266 project which is meant to be used in a EV charging use case. Uses
 [O-DF](http://www.opengroup.org/iot/odf/index.htm)/[O-MI](http://www.opengroup.org/iot/omi/index.htm)
 protocols for control.
 
-
+<img src="https://cdn.rawgit.com/AaltoAsia/O-MI/3a3b3192/O-MI%20Node/html/0-MI.svg" height=100 /><img src="https://cdn.rawgit.com/AaltoAsia/O-MI/3a3b3192/O-MI%20Node/html/0-DF.svg" height=100 />
 
 Components
 ----------
-
 
 
 Other software needed
@@ -64,6 +63,8 @@ Connections
 
 11.Wemos d1 mini (D2)<-->Connection indicator led
 
+12.Wemos d1 mini(TX)  <--> Wemos d1 mini(D4)  (For serial port monitoring features)
+
 Reprogramming Sonoff
 -------------------
 
@@ -87,9 +88,9 @@ reprogrammed, which is quite easy.
 This program only waits for "I" or "O" from serial and sets the relay to
 corresponding state.
 
-Debug Features
---------------
-You should modify `Telnet_debug.ino` to use debug features.
+SONOFF POW Debug Features
+-------------------------
+You should modify `Telnet_debug.ino` to use debug  features and telnet congfiguration.
 
 1.if you define `TELNET_DEBUG` ,you can monitor power,current,voltage,frequency as wireless.
 
@@ -97,6 +98,14 @@ You should modify `Telnet_debug.ino` to use debug features.
 
 Telnet Configuration 
 --------------------
+1.`const char* ssid = "WifiSSID";`
+  `const char* password = "WifiPassword";`
+
+2.Get IP address with `Serial.println(WiFi.localIP())` .
+
+3.Enter IP address on Putty(Terminal Program).
+putty download:http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html
+
 Programming ESP8266 Module
 -------------------------
 
@@ -123,7 +132,7 @@ How it works
 The server stores some reservations in a database. The user interface sends
 requests to the server to store information. The esp program listens the server
 for information.
-
+![charger_diagram](https://user-images.githubusercontent.com/23314775/29770376-aeebc792-8be6-11e7-8fa0-2a10496d0bf0.jpg)
 
 How to use
 ----------
