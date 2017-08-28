@@ -9,7 +9,6 @@ protocols for control.
 
 
 
-
 Components
 ----------
 
@@ -43,27 +42,27 @@ with agent for handling the reservations. This link has it preinstalled.
 
 Connections
 -----------
-1.5V WEMOS D1 MINI <-->EXTERNAL 5V SUPPLY<-->AI THINKER GSM/GPRS VCC
+1.5V Wemos d1 mini <-->EXTERNAL 5V SUPPLY<-->Ai thinker GSM/GPRS VCC
 
-2.GND WEMOS D1 MINI <--> GND<-->AI THINKER GSM/GPRS GND<-->SONOFF POW GND PIN(!!!!They must be connected same gnd ,otherwise serial communication does not work properly.)
+2.GND Wemos d1 mini<--> GND<-->Ai thinker GSM/GPRS GND<-->SONOFF POW GND PIN(!!!!They must be connected same gnd ,otherwise serial communication does not work properly.)
 
-3.WEMOS D1 MINI (D3)  <--> AI THINKER GSM/GPRS PWR
+3.Wemos d1 mini(D3)  <--> Ai thinker GSM/GPRS PWR
 
-4.WEMOS D1 MINI (D8)  <--> AI THINKER GSM/GPRS RX
+4.Wemos d1 mini (D8)  <--> Ai thinker GSM/GPRS RX
 
-5.WEMOS D1 MINI (D7)  <--> AI THINKER GSM/GPRS TX
+5.Wemos d1 mini(D7)  <--> Ai thinker GSM/GPRS TX
 
-6.WEMOS D1 MINI (D1)<--> LOCK TRIGGER PIN
+6.Wemos d1 mini (D1)<--> LOCK TRIGGER pin
 
-7.WEMOS D1 MINI (D5)<-->SONOFF POW TX PIN
+7.Wemos d1 mini (D5)<-->SONOFF POW TX pin
 
-8.WEMOS D1 MINI (D6)<-->SONOFF POW RX PIN
+8.Wemos d1 mini(D6)<-->SONOFF POW RX pin
 
-9.WEMOS D1 MINI (RX)<-->BETWEEN SONOFF POW AND WEMOS COMMUNICATION CHECK INDICATOR LED(IT FLASHES EVERY 8 SEC)
+9.Wemos d1 mini(RX)<-->Between sonoff and wemos communication check led(IT FLASHES EVERY 8 SEC)
 
-10.WEMOS D1 MINI (D0)<-->UPLOAD INDICATOR LED
+10.Wemos d1 mini (D0)<-->Upload indicator led
 
-11.WEMOS D1 MINI (D2)<-->CONNECTION INDICATOR LED
+11.Wemos d1 mini (D2)<-->Connection indicator led
 
 Reprogramming Sonoff
 -------------------
@@ -74,7 +73,7 @@ other than serial pins available easily. So for future expansion possibilities I
 chose to use another esp8266 for the real program. Anyways sonoff need to be
 reprogrammed, which is quite easy.
 
-1. Open `Relay/BlinkX/BlinkX.ino` in Arduino IDE
+1. Open `Son_off_pow/Telnet_debug/Telnet_debug.ino` in Arduino IDE
 2. Change board to `Generic ESP8266 Module`
 2. Open Sonoff module package to reveal the circuit board
 3. Solder a pin header to Sonoff holes marked as VCC, TX, RX, GND
@@ -88,7 +87,16 @@ reprogrammed, which is quite easy.
 This program only waits for "I" or "O" from serial and sets the relay to
 corresponding state.
 
+Debug Features
+--------------
+You should modify "Telnet_debug.ino" to use debug features.
 
+1.if you define "TELNET_DEBUG" ,you can monitor power,current,voltage,frequency as wireless.
+
+2.To send with serial port,define "SERIAL_COM" in software.
+
+Telnet Configuration 
+--------------------
 Programming ESP8266 Module
 -------------------------
 
