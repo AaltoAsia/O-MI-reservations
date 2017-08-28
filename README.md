@@ -9,8 +9,18 @@ protocols for control.
 
 <img src="https://cdn.rawgit.com/AaltoAsia/O-MI/3a3b3192/O-MI%20Node/html/0-MI.svg" height=100 /><img src="https://cdn.rawgit.com/AaltoAsia/O-MI/3a3b3192/O-MI%20Node/html/0-DF.svg" height=100 />
 
-Components
-----------
+Main Components
+---------------
+*Wemos d1 mini
+
+*Ai thinker A7 GPRS/GSM
+
+*Sonoff POW
+
+*leds for indication
+
+*Pin lock
+
 
 
 Other software needed
@@ -35,7 +45,7 @@ with agent for handling the reservations. This link has it preinstalled.
   * Static IP or DNS address is required
   * Ports need to be open to internet if the server is not used in the same network
 
-* I have test server running at http://otaniemi3d.cs.hut.fi/omi/node/ but it
+* I have test server running at http://biotope.cs.hut.fi/omi/node/ but it
   might require newer version from branch `master` of this repository.
 
 
@@ -114,8 +124,13 @@ Programming ESP8266 Module
 3. Change Settings for your Module (WeMos Mini for me)
 4. Upload
 
-Assembling
+Schematics
 ---------
+
+Pinlock Schemeatic
+------------------
+
+
 
 <!-- FIXME: 
 ![Connections](./doc/connections.jpg)
