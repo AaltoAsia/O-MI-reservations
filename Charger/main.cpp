@@ -57,45 +57,44 @@ public:
     return *this;
   }
 };
-const char* PoleSubscriptionRequest = "<omiEnvelope xmlns=\"http://www.opengroup.org/xsd/omi/1.0/\" version=\"1.0\" ttl=\"-1\"><read msgformat=\"odf\" interval=\"-1\" callback=\"0\"><msg><Objects xmlns=\"http://www.opengroup.org/xsd/odf/1.0/\"><Object><id>HWTEST</id><InfoItem name=\"LidStatus\"/></Object></Objects></msg></read></omiEnvelope>";
+//const char* PoleSubscriptionRequest = "<omiEnvelope xmlns=\"http://www.opengroup.org/xsd/omi/1.0/\" version=\"1.0\" ttl=\"-1\"><read msgformat=\"odf\" interval=\"-1\" callback=\"0\"><msg><Objects xmlns=\"http://www.opengroup.org/xsd/odf/1.0/\"><Object><id>HWTEST</id><InfoItem name=\"LidStatus\"/></Object></Objects></msg></read></omiEnvelope>";
+
+const char* PoleSubscriptionRequest =
+"<omiEnvelope xmlns=\"http://www.opengroup.org/xsd/omi/1.0/\" version=\"1.0\" ttl=\"0\">"
+  "<read msgformat=\"odf\" interval=\"-1\" callback=\"0\">"
+    "<msg>"
+      "<Objects xmlns=\"http://www.opengroup.org/xsd/odf/1.0/\">"
+        "<Object>"
+          "<id>ParkingService</id>"
+          "<Object>"
+            "<id>ParkingFacilities</id>"
+            "<Object>"
+              "<id>CSBuildingParkingLot</id>"
+              "<Object>"
+                "<id>ParkingSpaceTypes</id>"
+                "<Object>"
+                  "<id>ElectricVehicleParkingSpace</id>"
+                  "<Object>"
+                    "<id>Spaces</id>"
+                    "<Object>"
+                      "<id>EVSpace1</id>"
+                      "<Object>"
+                        "<id>Charger</id>"
+                        "<InfoItem name=\"LidStatus\"/>"
+                      "</Object>"
+                    "</Object>"
+                  "</Object>"
+                "</Object>"
+              "</Object>"
+            "</Object>"
+          "</Object>"
+        "</Object>"
+      "</Objects>"
+    "</msg>"
+  "</read>"
+"</omiEnvelope>";
 
 
-
-/*const char* PoleSubscriptionRequest = 
-  "<omiEnvelope xmlns=\"http://www.opengroup.org/xsd/omi/1.0/\" version=\"1.0\" ttl=\"-1\">"
-   "<read msgformat=\"odf\" interval=\"-1\" callback=\"0\">"
-     "<msg>"
-       "<Objects xmlns=\"http://www.opengroup.org/xsd/odf/1.0/\">"
-         "<Object>"
-           "<id>ParkingService</id>"
-           "<Object>"
-             "<id>ParkingFacilities</id>"
-             "<Object>"
-               "<id>DipoliParkingLot</id>"
-               "<Object>"
-                 "<id>ParkingSpaceTypes</id>"
-                 "<Object>"
-                   "<id>ElectricVehicleParkingSpace</id>"
-                   "<Object>"
-                     "<id>Spaces</id>"
-                     "<Object>"
-                       "<id>EVSpace2</id>"
-                       "<InfoItem name=\"Available\"/>"
-                       "<Object>"
-                         "<id>Charger</id>"
-                         "<InfoItem name=\"LidStatus\"/>"
-                       "</Object>"
-                     "</Object>"
-                   "</Object>"
-                 "</Object>"
-               "</Object>"
-             "</Object>"
-           "</Object>"
-         "</Object>"
-       "</Objects>"
-     "</msg>"
-   "</read>"
-  "</omiEnvelope>" ;*/
 
 uint64_t messageTimestamp = 0;
 uint64_t heartbeatTimestamp = 0;
